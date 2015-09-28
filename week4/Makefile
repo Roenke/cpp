@@ -1,13 +1,11 @@
-CPP_FLAGS=-Werror -Wall
-BIN_PREFIX=./bin/
-SRC_PREFIX=./src/
-CC=g++
-all: main.o command.o 
-	$(CC) $(CPP_FLAGS) $(BIN_PREFIX)main.o $(BIN_PREFIX)command.o -o ./bot.out
-main.o:
-	$(CC) -c $(SRC_PREFIX)main.cpp -o $(BIN_PREFIX)main.o
-command.o:
-	$(CC) -c $(SRC_PREFIX)command.cpp -o $(BIN_PREFIX)command.o
+CXXFLAGS=-Werror -Wall
+BIN=./bin/
+SOURCE=./src/
+CXX=g++
+all: $(BIN)main.o $(BIN)command.o 
+	$(CXX) $(CXXFLAGS) $^ -o ./bot.out
+$(BIN)%.o: $(SOURCE)%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 clean:
-	rm ./bin/*
+	rm ./bin/* ./bot.out
 .PHONY: clean all
