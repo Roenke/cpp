@@ -11,7 +11,7 @@ enum command {
 	show,
 	show_memory,
 	sub,
-	unknown,
+	unknown
 };
 
 enum error
@@ -75,12 +75,13 @@ int main() {
 				google_search_command(buffer);
 				break;
 			case show_memory:
-				int address;
+				uintptr_t address;
 				int count;
 				cin >> hex >> address;
-				cin.fail() ? throw wrong_hex_int : NULL;
+				if (cin.fail())
+					throw wrong_hex_int;
 				cin >> count;
-				cin.fail() ? throw wrong_int : show_memory_command(address, count);
+				cin.fail() ?  throw wrong_int : show_memory_command(address, count);
 				break;
 			case unknown:
 				on_unknown_command();
