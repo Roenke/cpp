@@ -1,5 +1,5 @@
 #include "mergesort.h"
-#include <stdlib.h>
+
 void swap(int& a, int& b)
 {
 	int tmp = a;
