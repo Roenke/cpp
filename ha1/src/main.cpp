@@ -1,46 +1,47 @@
 #include <iostream>
-#include <fstream>
+#include <vector>
+#include "parameters_parser.h"
+#include "parse_exception.h"
+#include "io_exception.h"
+#include "task_descriptor.h"
+#include "executor.h"
 
-const size_t aplhabet_count = 256;
+void ShowUsage()
+{
+    std::cout << "Usage:" << std::endl;
+    std::cout << "huffman [mode] [input-file-key] path/to/in_file.txt [output-file-key] path/to/new_out_file.txt" << std::endl;
+    std::cout << "where" << std::endl << "\t[mode]:" << std::endl << "\t\t-c encode mode" << std::endl << "\t\t-u decode mode" << std::endl;
+    std::cout << "\t[input-file-key]:" << std::endl << "\t\t-f, --file input file for encoding/decoding" << std::endl;
+    std::cout << "\t[output-file-key]:" << std::endl << "\t\t-o, --output output file for encoding/decoding" << std::endl;
+    std::cout << "Limits: Size of input file must be lesser then 5mb" << std::endl;
+}
 
-size_t frequencies[aplhabet_count];
 int main(int argc, char* argv[])
 {
-	using namespace std;
-	if (argc != 2)
-	{
-		cout << "Wrong number of arguments";
-		return 1;
-	}
+    using namespace std;
+    vector<string> args;
 
-	// for (size_t i = 0; i < aplhabet_count; ++i)
-	// {
-	// 	frequencies[aplhabet_count] = 0;
-	// }
+    args.assign(argv + 1, argv + argc);
+    parameters_parser parser{};
+    try
+    {
+        auto descriptor = parser.parse(args);
 
-	char* filename = argv[1];
-
-	ifstream file;
-	file.open(filename, ifstream::binary);
-
-	file.seekg(0, file.end);
-	cout << "Total in file: " << file.tellg();
-	file.seekg(0, file.beg);
-	size_t index;
-	char ch;
-	size_t counter = 0;
-	while (file.read(&ch, 1))
-	{
-		index = (uint8_t)ch;
-		frequencies[index]++;
-		counter++;
-	}
-	cout << "Total readed: " << counter << endl;
-
-	for (size_t i = 0; i < aplhabet_count; ++i)
-	{
-		cout << (int)i << " : " << frequencies[i] << endl;
-	}
-
-	return 0;
+        executor exec(descriptor);
+        exec.start();
+    }
+    catch(parse_exception const& ex)
+    {
+        cerr << ex.get_description() << endl;
+        ShowUsage();
+        return 1;
+    }
+    catch(io_exception const& ex)
+    {
+        cerr << ex.get_description() << endl;
+        ShowUsage();
+        return 1;
+    }
+    
+    return 0;
 }
