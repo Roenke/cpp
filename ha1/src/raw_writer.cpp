@@ -6,7 +6,7 @@ raw_writer::raw_writer(const std::string& filename)
 {
 }
 
-void raw_writer::append_data(char* data, size_t data_size)
+void raw_writer::append_data(const char* data, size_t data_size)
 {
     if(!opened_file_.is_open())
     {

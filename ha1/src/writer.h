@@ -11,7 +11,7 @@ public:
     virtual ~writer  ();
 
     std::streampos   get_file_size()   const;
-    virtual void     append_data(char*, size_t) = 0;
+    virtual void     append_data(const char*, size_t) = 0;
     
 protected:
     std::string      filename_;

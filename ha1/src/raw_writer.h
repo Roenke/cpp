@@ -10,5 +10,5 @@ public:
     writer& operator=  (writer&)  = delete;
     ~raw_writer        ();
 
-    virtual void append_data(char*, size_t) override;
+    virtual void append_data(const char*, size_t) override;
 };

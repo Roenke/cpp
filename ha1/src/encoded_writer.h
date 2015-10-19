@@ -12,6 +12,6 @@ public:
     encoded_writer& operator=(const encoded_writer&)        = delete;
     ~encoded_writer          () override;
 
-    void append_data         (char*, size_t) override;
+    void append_data         (const char*, size_t) override;
     void encode_char_mapping (std::vector<std::pair<uint8_t, size_t>> const&, std::streampos&) const;
 };

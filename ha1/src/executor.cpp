@@ -53,8 +53,9 @@ void executor::encode_file(std::vector<std::vector<bool>>& codes, raw_reader& re
         }
     }
 
-    if(bit_counter >= CHAR_BIT * sizeof(buf))
+    if(bit_counter > 0)
     {
+        buf = (buf << (CHAR_BIT - bit_counter)) | false;
         output_buffer[output_buffer_ptr++] = reverse_bytes(buf);
     }
 
