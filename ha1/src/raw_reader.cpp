@@ -37,6 +37,8 @@ void raw_reader::read_frequencies(std::vector<std::pair<uint8_t, size_t>>& frequ
     {
         frequencies[buffer[i]].second++;
     }
+
+    delete[] buffer;
 }
 
 bool raw_reader::read_content(char* buffer, size_t buffer_size, size_t& readed)
