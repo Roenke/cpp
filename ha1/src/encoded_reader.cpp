@@ -29,6 +29,8 @@ void encoded_reader::read_frequencies(std::vector<std::pair<uint8_t, size_t>>& f
         long_fraquency_ptr = reinterpret_cast<size_t*>(&buffer[offset + sizeof(uint8_t)]);
         frequencies.push_back(std::pair<uint8_t, size_t>(*character_ptr, *long_fraquency_ptr));
     }
+
+    delete[] buffer;
 }
 
 bool encoded_reader::read_content(char* buffer, size_t buffer_size, size_t& readed)
