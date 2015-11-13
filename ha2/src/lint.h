@@ -25,7 +25,7 @@ namespace apa
         lint& operator+();
         lint& operator-();
 
-        std::string to_string();
+        std::string to_string() const;
 
         friend bool operator==(lint const&, lint const&);
         friend bool operator< (lint const&, lint const&);
@@ -36,14 +36,14 @@ namespace apa
         friend lint& operator/=(lint&, lint const&);
 
     private:
-        static uint32_t constexpr base = 4294967296;
+        static uint64_t constexpr base = 4294967295;
         
         uint8_t sign_;
 
         size_t rank_;       // номер старшего ненулевого разр€да
         size_t size_;       // сколько пам€ти выделено
         uint32_t* number_;  // массив дл€ хранени€ числа
-        void move();
+        void alloc(uint32_t = -1);
     };
 
     // »нкремент
