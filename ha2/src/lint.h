@@ -1,12 +1,12 @@
 #pragma once
 #include <cstdint>
 #include <string>
+#include "vector.h"
 
 namespace apa
 {
-    class lint
+    struct lint
     {
-    public:
         lint();                    //  онструктор по умолчанию
         lint(std::string const&);  //  онструктор от строки
         lint(int);
@@ -36,14 +36,10 @@ namespace apa
         friend lint& operator/=(lint&, lint const&);
 
     private:
-        static uint64_t constexpr base = 4294967295;
+        static uint64_t constexpr base = 1000000000;
         
-        uint8_t sign_;
-
-        size_t rank_;       // номер старшего ненулевого разр€да
-        size_t size_;       // сколько пам€ти выделено
-        uint32_t* number_;  // массив дл€ хранени€ числа
-        void alloc(uint32_t = -1);
+        int sign_;
+        helpers::vector<uint32_t>* bits_;
     };
 
     // »нкремент

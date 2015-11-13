@@ -6,7 +6,6 @@
 int main()
 {
     //start_all();
-    //start_my_tests();
-    std::cout << 4294967295 + 1;
+    start_my_tests();
     return 0;
 }
