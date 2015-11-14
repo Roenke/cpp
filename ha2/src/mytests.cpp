@@ -57,10 +57,14 @@ void from_string_test()
     lint num1("12323434");
     lint num2("123235");
     lint num3("1000000000");
-    lint num4("1000000001");
+    lint num4("10000000010");
     lint num5("999999999");
-    auto result = num1 + 2 * num2 + 3 * num3 + 4 * num4;
-    assert(lint("6012569909") == result - num5);
+    lint num6("-1");
+    lint num7("-0000000000000000000000000000000000000000000000000000000000001");
+    lint num8("0000000000000000000000000000000000000000000000000000000000001");
+    lint num9("+0000000000000000000000000000000000000000000000000000000000001");
+    //auto result = num1 + 2 * num2 + 3 * num3 + 4 * num4;
+    //assert(lint("6012569909") == result - num5);
 
     std::cout << "from string tests passed" << std::endl;
 }
@@ -83,6 +87,12 @@ void my_vector_tests()
     vector4[0] = 1;
     assert(vector4[0] != vector3[0]);
 
+    vector1.push_back(1);
+    vector1.push_back(2);
+    vector1.push_back(3);
+    vector1.push_back(4);
+    vector1.push_back(5);
+
     std::cout << "vector tests passed" << std::endl;
 }
 
@@ -99,5 +109,5 @@ void start_my_tests()
     decrement_tests(); 
     abs_tests();
     pow_tests();
-    //from_string_test();
+    from_string_test();
 }

@@ -17,6 +17,7 @@ namespace helpers
         
         void push_back(T);
         T& pop_back();
+        T const& back();
         size_t size() const;
 
     private:
@@ -97,6 +98,14 @@ T& helpers::vector<T>::pop_back()
 {
     assert(size_ > 0);
     return content_[--size_];
+}
+
+template <typename T>
+T const& helpers::vector<T>::back()
+{
+    assert(size_ > 0);
+
+    return content_[size_ - 1];
 }
 
 template <typename T>

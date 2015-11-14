@@ -9,11 +9,26 @@ lint::lint()
 }
 
 // stub
-lint::lint(std::string const&)
+lint::lint(std::string const& s)
     : sign_(0)
-    , bits_(new vector<uint32_t>(1))
+    , bits_(nullptr)
 {
-    bits_->push_back(0);
+    auto str_length = s.length();
+    if(str_length < 9 || s[0] == '-' && str_length == 9)
+    {
+        sign_ = atoi(s.c_str());
+        return;
+    }
+
+    bits_ = new vector<uint32_t>();
+    auto start_value = static_cast<int>(s.length());
+    int pasre_result;
+    for (auto i = start_value; i > 0; i -= 9)
+    {
+        pasre_result = atoi(i < 9 ? s.substr(0, i).c_str() : s.substr(i - 9, 9).c_str());
+        bits_->push_back(pasre_result);
+    }
+    while (bits_->size() > 1 && bits_->back() == 0) (void)bits_->pop_back();
 }
 
 lint::lint(int number)
@@ -50,7 +65,12 @@ lint::operator bool() const
 
 lint::operator int() const
 {
-    return 0;
+    if(bits_ == nullptr)
+    {
+        return sign_;
+    }
+
+    return (*bits_)[0];
 }
 
 lint::operator long() const
