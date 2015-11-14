@@ -44,10 +44,10 @@ static void failed_conversions_test()
 static void test_comparison()
 {
     lint long_int1 = 2;
-    lint long_int2 = 3.; // constructing from double value 
+    lint long_int2 = lint(3.); // constructing from double value 
     // all comparisons
     bool check = false;
-    check = 3.14 < long_int1;
+    check = lint(3.14) < long_int1;
     check = long_int1 != long_int2;
     check = 5 > long_int1;
     check = long_int1 == long_int2;
@@ -93,7 +93,7 @@ static void test_bin_op()
     lint a = 123456789;
     const lint b = 987654321;
     lint c = a * b;
-    lint d = 3.14 + c;
+    lint d = lint(3.14) + c;
     c = a * b;
     c = a + b;
     c = c / a;

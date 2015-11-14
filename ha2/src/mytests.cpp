@@ -55,14 +55,21 @@ void pow_tests()
 void from_string_test()
 {
     lint num1("12323434");
+    assert(num1.is_small());
+
     lint num2("123235");
+    assert(num2.is_small());
+
     lint num3("1000000000");
+    assert(!num3.is_small());
+
     lint num4("10000000010");
     lint num5("999999999");
     lint num6("-1");
     lint num7("-0000000000000000000000000000000000000000000000000000000000001");
     lint num8("0000000000000000000000000000000000000000000000000000000000001");
     lint num9("+0000000000000000000000000000000000000000000000000000000000001");
+    lint num10("-999999999");
     //auto result = num1 + 2 * num2 + 3 * num3 + 4 * num4;
     //assert(lint("6012569909") == result - num5);
 
@@ -96,6 +103,25 @@ void my_vector_tests()
     std::cout << "vector tests passed" << std::endl;
 }
 
+void to_string_tests()
+{
+    lint num1(100);
+    auto str1 = num1.to_string();
+    assert(str1 == "100");
+
+    lint num2(-100);
+    auto str2 = num2.to_string();
+    assert(str2 == "-100");
+
+    lint num3("+34554654897934534543534");
+    auto str3 = num3.to_string();
+    assert(str3 == "34554654897934534543534");
+
+    lint num4("-34554654897934534543534");
+    auto str4 = num4.to_string();
+    assert(str4 == "-34554654897934534543534");
+}
+
 void start_my_tests()
 {
     my_vector_tests();
@@ -110,4 +136,5 @@ void start_my_tests()
     abs_tests();
     pow_tests();
     from_string_test();
+    to_string_tests();
 }

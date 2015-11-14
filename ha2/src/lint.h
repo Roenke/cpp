@@ -11,7 +11,7 @@ namespace apa
         lint(std::string const&);  // Конструктор от строки
         lint(int);
         lint(long long);           // Конструктор от целого числа
-        lint(double);              // Конструктор от вещественного числа
+        explicit lint(double);     // Конструктор от вещественного числа
 
         lint(lint const&);         // Копирование
 
@@ -24,6 +24,8 @@ namespace apa
 
         lint& operator+();
         lint& operator-();
+
+        bool is_small() const;
 
         std::string to_string() const;
 

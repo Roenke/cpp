@@ -1,5 +1,8 @@
 #include "lint.h"
-#include <algorithm>
+#include <sstream>
+#include <string>
+#include <iostream>
+
 using namespace apa;
 using helpers::vector;
 lint::lint()
@@ -14,20 +17,29 @@ lint::lint(std::string const& s)
     , bits_(nullptr)
 {
     auto str_length = s.length();
-    if(str_length < 9 || s[0] == '-' && str_length == 9)
+    if(str_length < 10 || s[0] == '-' && str_length == 10)
     {
         sign_ = atoi(s.c_str());
         return;
     }
 
+    sign_ = 1;
     bits_ = new vector<uint32_t>();
     auto start_value = static_cast<int>(s.length());
-    int pasre_result;
-    for (auto i = start_value; i > 0; i -= 9)
+    if(s[0] == '-')
     {
+        sign_ = -1;
+    }
+
+    int pasre_result;
+    for (auto i = start_value; i >= 0; i -= 9)
+    {
+        auto str = i < 9 ? s.substr(0, i).c_str() : s.substr(i - 9, 9).c_str();
         pasre_result = atoi(i < 9 ? s.substr(0, i).c_str() : s.substr(i - 9, 9).c_str());
+        if (pasre_result < 0) pasre_result *= 1;
         bits_->push_back(pasre_result);
     }
+
     while (bits_->size() > 1 && bits_->back() == 0) (void)bits_->pop_back();
 }
 
@@ -42,10 +54,11 @@ lint::lint(long long number)
 {}
 
 //stub
-lint::lint(double)
-    : bits_(nullptr)
+lint::lint(double number)
+    : sign_(0)
+    , bits_(nullptr)
 {
-    sign_ = 0;
+    
 }
 
 lint::lint(lint const& other)
@@ -95,9 +108,32 @@ lint& lint::operator-()
     return *this;
 }
 
+bool lint::is_small() const
+{
+    return bits_ == nullptr;
+}
+
 std::string lint::to_string() const
 {
-    return "";
+    if (bits_ == nullptr)
+    {
+        return std::to_string(sign_);
+    }
+
+    char buf[11];
+    std::ostringstream ost;
+    if (sign_ == -1) ost << '-';
+    auto size = bits_->size();
+    sprintf_s(buf, "%u", (*bits_)[(int)(size - 1)]);
+    ost << buf;
+
+    for (auto i = static_cast<int>(size - 2); i >= 0; --i)
+    {
+        sprintf_s(buf, "%09u", (*bits_)[i]);
+        ost << buf;
+    }
+
+    return ost.str();
 }
 
 lint& apa::operator++(lint& val)
