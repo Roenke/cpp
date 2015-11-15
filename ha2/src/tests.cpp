@@ -2,7 +2,7 @@
 #include <sstream>
 #include <assert.h>
 #include "lint.h"
-
+#include "tests.h"
 using apa::lint;
 
 //#define RUN_FAILED_COMP_TEST
@@ -130,4 +130,19 @@ static void test_io()
     assert(c == 15);
 
     (void)test_io;
+}
+
+
+void start_all()
+{
+    test_construction();
+    test_conversions();
+    test_comparison();
+    test_check();
+    test_inc_n_dec();
+    test_op_n_eq();
+    test_bin_op();
+    test_free_func();
+    test_io();
+    failed_conversions_test();
 }

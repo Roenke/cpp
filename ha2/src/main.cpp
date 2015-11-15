@@ -1,13 +1,10 @@
 #include "lint.h"
 #include "mytests.h"
-void start_tests()
-{
-    
-}
+#include "tests.h"
 
 int main()
 {
-    start_tests();
-    start_my_tests();
+    //start_all();
+    //start_my_tests();
     return 0;
 }
