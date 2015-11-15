@@ -15,8 +15,9 @@ math::imp_double::imp_double(double value)
 
 math::imp_double::imp_double(double value, double delta)
     : value_(value)
-    , delta_(delta)
-{}
+{
+    delta = std::max()
+}
 
 math::imp_double math::imp_double::operator-() const
 {
@@ -59,7 +60,7 @@ bool math::operator<(imp_double const& left, imp_double const& right)
     auto a = left.get_value();
     auto da = left.get_delta();
     auto b = right.get_value();
-    auto db = left.get_delta();
+    auto db = right.get_delta();
     if (a < b)
     {
         return a + da < b - db;
