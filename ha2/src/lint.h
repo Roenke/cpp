@@ -15,28 +15,43 @@ namespace apa
 
         lint(lint const&);         //  опирование
 
-        explicit operator bool();
-        explicit operator int();
-        explicit operator long();
+        explicit operator bool() const;
+        explicit operator int() const;
+        explicit operator long() const;
 
-        int operator=(lint const&);
-        bool operator!();          // ¬озможность использовать в условных выражени€х (true, если не ноль)
+        lint& operator=(lint const&);
+       // bool operator!(); // вроде лишнее                // ¬озможность использовать в условных выражени€х (true, если не ноль)
 
         lint& operator+();
         lint& operator-();
 
         std::string to_string();
 
+        friend bool operator==(lint const&, lint const&);
+        friend bool operator< (lint const&, lint const&);
+
+        friend lint& operator+=(lint&, lint const&);
+        friend lint& operator-=(lint&, lint const&);
+        friend lint& operator*=(lint&, lint const&);
+        friend lint& operator/=(lint&, lint const&);
+
     private:
         static uint32_t constexpr base = 4294967296;
+        
+        uint8_t sign_;
+
+        size_t rank_;       // номер старшего ненулевого разр€да
+        size_t size_;       // сколько пам€ти выделено
+        uint32_t* number_;  // массив дл€ хранени€ числа
+        void move();
     };
 
     // »нкремент
     lint& operator++(lint&);       // prefix
-    lint operator++ (lint&, int);  // postfix
+    lint  operator++(lint&, int);  // postfix
 
     lint& operator--(lint&);       // prefix
-    lint operator-- (lint&, int);  // postfix
+    lint  operator--(lint&, int);  // postfix
 
     bool operator==(lint const&, lint const&);
     bool operator!=(lint const&, lint const&);
