@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <assert.h>
-#include <lint.h>
+#include "lint.h"
 
 using apa::lint;
 

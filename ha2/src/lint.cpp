@@ -1,6 +1,6 @@
 #include "lint.h"
 
-lint::lint()
+apa::lint::lint()
 {
 
 }
