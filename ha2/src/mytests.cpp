@@ -7,6 +7,37 @@
 using namespace apa;
 using helpers::vector;
 
+void casts_tests()
+{
+    auto ll_number = 1000000000000;
+    lint my_long(ll_number);
+    auto new_ll = static_cast<long long>(my_long);
+    assert(ll_number == new_ll);
+
+    long long short_long = 100000;
+    lint my(short_long);
+    assert(my.is_small());
+
+    long long min_int = INT32_MIN;
+    long long max_int = INT32_MAX;
+    auto max_int_overflow = INT32_MAX + 1LL;
+    auto min_int_overflow = INT32_MIN - 1LL;
+    lint my_big(max_int);
+    lint my_small(min_int);
+    lint my_big_overflow(max_int_overflow);
+    lint my_small_overflow(min_int_overflow);
+
+    assert(my_big.is_small());
+    assert(my_small.is_small());
+    assert(!my_big_overflow.is_small());
+    assert(!my_small_overflow.is_small());
+
+    assert(max_int == my_big);
+    assert(my_small_overflow == min_int_overflow);
+
+    std::cout << "Long long casts passed" << std::endl;
+}
+
 void plus_tests()
 {
     
@@ -25,6 +56,28 @@ void mul_tests()
 void div_tests()
 {
     
+}
+
+void eq_cmp_tests()
+{
+    lint num1(123);
+    lint num2(-123);
+    lint num3(123.);
+
+    assert(num1 != num2);
+    assert(-num1 == num2);
+    assert(num1 == -num2);
+    assert(num1 == num3);
+
+    lint big_num1(1233546546546LL);
+    lint big_num2("3495756795867895670384546");
+    lint big_num3("-3495756795867895670384546");
+
+    assert(big_num2 != big_num3);
+    assert(big_num2 == -big_num3);
+    assert(-big_num2 == big_num3);
+    assert(num1 != big_num1);
+    assert(num2 != big_num3);
 }
 
 void cmp_tests()
@@ -137,4 +190,6 @@ void start_my_tests()
     pow_tests();
     from_string_test();
     to_string_tests();
+    casts_tests();
+    eq_cmp_tests();
 }

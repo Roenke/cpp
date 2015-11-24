@@ -17,13 +17,13 @@ namespace apa
 
         explicit operator bool() const;
         explicit operator int() const;
-        explicit operator long() const;
+        explicit operator long long() const;
 
         lint& operator=(lint const&);
        // bool operator!(); // вроде лишнее                // ¬озможность использовать в условных выражени€х (true, если не ноль)
 
-        lint& operator+();
-        lint& operator-();
+        lint operator+() const;
+        lint operator-() const;
 
         bool is_small() const;
 
@@ -38,10 +38,12 @@ namespace apa
         friend lint& operator/=(lint&, lint const&);
 
     private:
-        static uint64_t constexpr base = 1000000000;
+        static uint64_t constexpr base = 1000 * 1000 * 1000;
         
         int sign_;
         helpers::vector<uint32_t>* bits_;
+
+        void assert_optimization() const;
     };
 
     // »нкремент

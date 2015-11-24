@@ -1,7 +1,7 @@
 #include "lint.h"
 #include <sstream>
 #include <string>
-#include <iostream>
+#include <algorithm>
 
 using namespace apa;
 using helpers::vector;
@@ -34,9 +34,8 @@ lint::lint(std::string const& s)
     int pasre_result;
     for (auto i = start_value; i >= 0; i -= 9)
     {
-        auto str = i < 9 ? s.substr(0, i).c_str() : s.substr(i - 9, 9).c_str();
         pasre_result = atoi(i < 9 ? s.substr(0, i).c_str() : s.substr(i - 9, 9).c_str());
-        if (pasre_result < 0) pasre_result *= 1;
+        if (pasre_result < 0) pasre_result *= -1;
         bits_->push_back(pasre_result);
     }
 
@@ -49,17 +48,26 @@ lint::lint(int number)
 {}
 
 lint::lint(long long number)
-    : sign_(number)
-    , bits_(nullptr)
-{}
-
-//stub
-lint::lint(double number)
     : sign_(0)
     , bits_(nullptr)
 {
-    
+    if(number > 0 && number <= static_cast<long long>(INT32_MAX) ||
+        number < 0 && number >= static_cast<long long>(INT32_MIN))
+    {
+        sign_ = static_cast<int>(number);
+    }
+    else
+    {
+        sign_ = number > 0 ? 1 : -1;
+        bits_ = new vector<uint32_t>(2);
+        (*bits_)[0] = number % base;
+        (*bits_)[1] = number / base;
+    }
 }
+
+lint::lint(double number)
+    : lint(std::to_string(number).substr(std::to_string(number).find('.')))
+{}
 
 lint::lint(lint const& other)
     : sign_(other.sign_)
@@ -86,9 +94,19 @@ lint::operator int() const
     return (*bits_)[0];
 }
 
-lint::operator long() const
+lint::operator long long() const
 {
-    return 0L;
+    if(bits_ != nullptr)
+    {
+        if(bits_->size() > 1)
+        {
+            return static_cast<long long>((*bits_)[0]) + base * (*bits_)[1];
+        }
+        
+        return (*bits_)[0];
+    }
+
+    return sign_;
 }
 
 lint& lint::operator=(lint const& from)
@@ -96,16 +114,17 @@ lint& lint::operator=(lint const& from)
     return *this;
 }
 
-lint& lint::operator+()
+lint lint::operator+() const
 {
-    sign_ = 0;
-    return *this;
+    auto other(*this);
+    return other;
 }
 
-lint& lint::operator-()
+lint lint::operator-() const
 {
-    sign_ = 1;
-    return *this;
+    auto other(*this);
+    other.sign_ = -other.sign_;
+    return other;
 }
 
 bool lint::is_small() const
@@ -124,7 +143,7 @@ std::string lint::to_string() const
     std::ostringstream ost;
     if (sign_ == -1) ost << '-';
     auto size = bits_->size();
-    sprintf_s(buf, "%u", (*bits_)[(int)(size - 1)]);
+    sprintf_s(buf, "%u", (*bits_)[static_cast<int>(size - 1)]);
     ost << buf;
 
     for (auto i = static_cast<int>(size - 2); i >= 0; --i)
@@ -134,6 +153,24 @@ std::string lint::to_string() const
     }
 
     return ost.str();
+}
+
+void lint::assert_optimization() const
+{
+    // Проверка, что число не может быть представлено как короткое
+    if(bits_ == nullptr)
+    {
+        return;
+    }
+    for (int i = bits_->size() - 1; i > 0; --i)
+    {
+        if ((*bits_)[i] != 0)
+        {
+            return;
+        }
+    }
+
+    assert(false);
 }
 
 lint& apa::operator++(lint& val)
@@ -172,7 +209,41 @@ bool apa::operator==(lint const& l, lint const& r)
         return true;
     }
     
-    return l.bits_ == r.bits_;
+    if(l.bits_ == nullptr || r.bits_ == nullptr)
+    {
+        return false;
+    }
+
+    auto& lbits = *l.bits_;
+    auto& rbits = *r.bits_;
+
+    int i;
+    auto min_size = std::min(lbits.size(), rbits.size());
+    for (i = 0; i < min_size; ++i)
+    {
+        if (lbits[i] != rbits[i])
+        {
+            return false;
+        }
+    }
+
+    for (auto j = i; j < rbits.size(); ++j)
+    {
+        if(rbits[j] != 0)
+        {
+            return false;
+        }
+    }
+
+    for (auto j = i; j < lbits.size(); ++j)
+    {
+        if(lbits[j] != 0)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool apa::operator!=(lint const& l, lint const& r)
