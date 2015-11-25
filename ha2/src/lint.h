@@ -49,7 +49,6 @@ namespace apa
         void from_long_long(long long);
         lint& try_to_small();
         void assert_optimization() const;
-        lint& operator/= (int);
         lint& small_division(int);
     };
 

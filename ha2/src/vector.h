@@ -177,13 +177,15 @@ void helpers::vector<T>::allocate(int capacity = -1)
 
     auto memory_region = new T[capacity];
     memset(memory_region, 0, sizeof(T) * capacity);
-    for (size_t i = 0; i < size_; ++i)
+    if(content_ != nullptr)
     {
-        memory_region[i] = content_[i];
-    }
-
-    if(content_!= nullptr)
+        for (size_t i = 0; i < size_; ++i)
+        {
+            memory_region[i] = content_[i];
+        }
         delete[] content_;
+    }
+    
 
     content_ = memory_region;
     capacity_ = capacity;

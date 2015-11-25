@@ -109,12 +109,12 @@ lint& lint::operator=(lint const& other)
 {
     if(other.bits_ != nullptr)
     {
-        if(bits_ != nullptr)
+        if(bits_ == nullptr)
         {
-            *bits_ = *other.bits_;
+            bits_ = new vector<uint32_t>();
         }
         
-        bits_ = new vector<uint32_t>(*other.bits_);
+        *bits_ = *other.bits_;
     }
     else
     {
@@ -455,7 +455,7 @@ lint& apa::operator-=(lint& l, lint const&r)
 
     if(l > 0 && r > 0 && l < r)
     {
-        l = r - l;
+        l = -(r - l);
         return l;
     }
 
@@ -474,6 +474,7 @@ lint& apa::operator-=(lint& l, lint const&r)
     if(r < 0 && l < 0)
     {
         l = abs(l) > abs(r) ? -(-l - (-r)) : -r - (-l);
+        return l;
     }
 
     auto right(r);
@@ -487,6 +488,11 @@ lint& apa::operator-=(lint& l, lint const&r)
     int result;
     for (size_t i = 0; i < right.bits_->size() || k; ++i) 
     {
+        if(l.bits_->size() <= i)
+        {
+            l.bits_->push_back(0);
+        }
+
         result = (*l.bits_)[i] - (k + (i < right.bits_->size() ? (*right.bits_)[i] : 0));
         k = result < 0;
         if (k)
@@ -526,7 +532,7 @@ lint& apa::operator*=(lint& l, lint const&r)
     c.unpack();
 
     c.bits_->resize(l.bits_->size() + right.bits_->size());
-
+    c.sign_ = l.sign_ * right.sign_;
     for (auto i = 0; i < l.bits_->size(); ++i)
     {
         for (auto j = 0, carry = 0; j < right.bits_->size() || carry; ++j)
@@ -546,6 +552,11 @@ lint& apa::operator*=(lint& l, lint const&r)
 
 lint& apa::operator/=(lint& l, lint const& r)
 {
+    if(r.is_small() && r == 0)
+    {
+        (void)(23 / r.sign_);
+    }
+
     if(l.is_small() && r.is_small())
     {
         auto value = l.sign_ / r.sign_;
@@ -575,9 +586,11 @@ lint& apa::operator/=(lint& l, lint const& r)
         l.unpack();
     }
 
+    
     lint left(1);
     auto right(r);
     right.unpack();
+    auto r_sign = right.sign_;
     lint center;
     lint lc;
     lint lcp;
@@ -593,7 +606,7 @@ lint& apa::operator/=(lint& l, lint const& r)
             l = center;
             break;
         }
-        std::cout << center.to_string() << std::endl;
+//        std::cout << center << std::endl;
         if (lesser)
         {
             left = center + 1;
@@ -604,6 +617,7 @@ lint& apa::operator/=(lint& l, lint const& r)
         }
     }
 
+    l.sign_ *= r_sign;
     return l.try_to_small();
 }
 

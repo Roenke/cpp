@@ -10,7 +10,109 @@ using helpers::vector;
 
 void great_test()
 {
-    std::ifstream file("")
+    std::ifstream sum_file("sum.txt");
+    std::ifstream sub_file("sub.txt");
+    std::ifstream mul_file("mul.txt");
+    std::ifstream div_file("div.txt");
+    lint my_result;
+    size_t successed = 0;
+    int n;
+    sum_file >> n;
+    lint a, b, result;
+    for (int i = 1; i <= n; ++i)
+    {
+        sum_file >> a >> b >> result;
+        try
+        {
+            my_result = a + b;
+        }
+        catch(std::exception const& e)
+        {
+            std::cout << "Exception: " << e.what() << std::endl;
+            continue;
+        }
+        if (my_result == result)
+        {
+            successed += 1;
+        }
+        else
+        {
+            std::cout << "Wrong answer test " << i << std::endl;
+            std::cout << "a = " << a << std::endl;
+            std::cout << "b = " << b << std::endl;
+            std::cout << "res = " << result << std::endl;
+            std::cout << "my res = " << my_result << std::endl;
+        }
+    }
+    std::cout << "Sum tests result: " << successed << " / " << n << std::endl;
+
+    successed = 0;
+    mul_file >> n;
+    for (int i = 1; i <= n; ++i)
+    {
+        mul_file >> a >> b >> result;
+        my_result = a * b;
+        if (my_result == result)
+        {
+            successed += 1;
+        }
+        else
+        {
+            std::cout << "Wrong answer test " << i << std::endl;
+        }
+    }
+    std::cout << "Mul tests result: " << successed << " / " << n << std::endl;
+
+    successed = 0;
+    sub_file >> n;
+    for (int i = 1; i <= n; ++i)
+    {
+        sub_file >> a >> b >> result;
+        my_result = a - b;
+        if (my_result == result)
+        {
+            successed += 1;
+        }
+        else
+        {
+            std::cout << "Wrong answer test " << i << std::endl;
+            std::cout << "a = " << a << std::endl;
+            std::cout << "b = " << b << std::endl;
+            std::cout << "res = " << result << std::endl;
+            std::cout << "my res = " << my_result << std::endl;
+
+        }
+    }
+    std::cout << "Sub tests result: " << successed << " / " << n << std::endl;
+
+    successed = 0;
+    div_file >> n;
+    for (int i = 1; i <= n; ++i)
+    {
+        div_file >> a >> b >> result;
+        try
+        {
+            my_result = a / b;
+        }
+        catch (std::exception const& e)
+        {
+            std::cout << "Exception: " << e.what() << std::endl;
+            continue;
+        }
+        if (my_result == result)
+        {
+            successed += 1;
+        }
+        else
+        {
+            std::cout << "Wrong answer test " << i << std::endl;
+            std::cout << "a = " << a << std::endl;
+            std::cout << "b = " << b << std::endl;
+            std::cout << "res = " << result << std::endl;
+            std::cout << "my res = " << my_result << std::endl;
+        }
+    }
+    std::cout << "Div tests result: " << successed << " / " << n << std::endl;
 }
 
 void casts_tests()
@@ -93,6 +195,11 @@ void minus_tests()
     assert((big_result - big_result).is_small());
     assert(big_result.to_string() == "8934769679583758672945879243653248740723658749856747564244781023415263954100134515414000");
 
+    //lint num("-2151319519250942926957424185606849596061442384485818807166972142674771968");
+    //lint second("-3182150698190905819102845827987336239061910786797723967404482560532676608");
+    //lint res(num - second);
+    //assert(res.to_string() == "1030831178939962892145421642380486643000468402311905160237510417857904640");
+
     std::cout << "subtraction tests passed" << std::endl;
 }
 
@@ -140,8 +247,13 @@ void div_tests()
 
     lint b2("8347984757923738474983794");
     lint res2("9999");
-    lint res3(a / b2);
+    auto res3(a / b2);
     assert(res3 == res2);
+    assert(res3.is_small());
+
+    lint a1("11620050176394463397996547812951676338039007590238314705568399360");
+    auto res4(a1 / 4271);
+    assert((a1 / 4271).to_string() == "2720686063309403745726187734242958636862329100968933436096558");
 
     std::cout << "Division tests passed" << std::endl;
 }
@@ -287,8 +399,8 @@ void from_string_test()
     lint num8("0000000000000000000000000000000000000000000000000000000000001");
     lint num9("+0000000000000000000000000000000000000000000000000000000000001");
     lint num10("-999999999");
-    //auto result = num1 + 2 * num2 + 3 * num3 + 4 * num4;
-    //assert(lint("6012569909") == result - num5);
+//    auto result = num1 + 2 * num2 + 3 * num3 + 4 * num4;
+//    assert(lint("6012569909") == result - num5);
 
     std::cout << "from string tests passed" << std::endl;
 }
@@ -361,4 +473,5 @@ void start_my_tests()
     from_string_test();
     to_string_tests();
     casts_tests();
+    great_test();
 }
