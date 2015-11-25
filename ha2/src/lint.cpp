@@ -1,7 +1,6 @@
 #include "lint.h"
 #include <sstream>
 #include <string>
-#include <algorithm>
 
 using namespace apa;
 using helpers::vector;
@@ -11,7 +10,6 @@ lint::lint()
 {
 }
 
-// stub
 lint::lint(std::string const& s)
     : sign_(0)
     , bits_(nullptr)
@@ -66,7 +64,7 @@ lint::lint(long long number)
 }
 
 lint::lint(double number)
-    : lint(std::to_string(number).substr(std::to_string(number).find('.')))
+    : lint(std::to_string(number).substr(0, std::to_string(number).find('.')))
 {}
 
 lint::lint(lint const& other)
@@ -214,36 +212,7 @@ bool apa::operator==(lint const& l, lint const& r)
         return false;
     }
 
-    auto& lbits = *l.bits_;
-    auto& rbits = *r.bits_;
-
-    int i;
-    auto min_size = std::min(lbits.size(), rbits.size());
-    for (i = 0; i < min_size; ++i)
-    {
-        if (lbits[i] != rbits[i])
-        {
-            return false;
-        }
-    }
-
-    for (auto j = i; j < rbits.size(); ++j)
-    {
-        if(rbits[j] != 0)
-        {
-            return false;
-        }
-    }
-
-    for (auto j = i; j < lbits.size(); ++j)
-    {
-        if(lbits[j] != 0)
-        {
-            return false;
-        }
-    }
-
-    return true;
+    return cmp_bits(*l.bits_, *r.bits_) == 0;
 }
 
 bool apa::operator!=(lint const& l, lint const& r)
@@ -251,38 +220,31 @@ bool apa::operator!=(lint const& l, lint const& r)
     return !(l == r);
 }
 
-// stub
 bool apa::operator<(lint const& l, lint const& r)
 {
-    if (l.sign_ < r.sign_)
+    if (l.is_small() && r.is_small())
     {
-        return true;
+        return l.sign_ < r.sign_;
     }
 
-    if(r.sign_ < l.sign_)
+    if(l.is_small())
     {
-        return false;
+        return r.sign_ == 1;
     }
 
-    // r.sign == l.sign
-
-    // Одно из чисел котороткое
-
-    if (l.bits_ == nullptr)
+    if(r.is_small())
     {
-        return l.sign_ == 1;
+        return l.sign_ == -1;
     }
 
-    if (r.bits_ == nullptr)
+    if(r.sign_ != l.sign_)
     {
-        return r.sign_ == -1;
+        return l.sign_ < r.sign_;
     }
-
-    // Оба длинные и одного знака
 
     auto cmp_result = cmp_bits(*l.bits_, *r.bits_);
 
-    return cmp_result == r.sign_;
+    return cmp_result == -r.sign_;
 }
 
 bool apa::operator>(lint const& l, lint const& r)
@@ -360,8 +322,22 @@ lint apa::abs(lint& other)
     return other > 0 ? other : -other;
 }
 
-lint apa::pow(lint&, int)
+lint apa::pow(lint& number, int degree)
 {
-    // stub. ToDo: implement O(log(n)) pow
-    return 0;
+    auto result(number);
+    while(degree != 1)
+    {
+        if(degree % 2 == 0)
+        {
+            result *= result;
+            degree /= 2;
+        }
+        else
+        {
+            result *= number;
+            degree -= 1;
+        }
+    }
+
+    return result;
 }

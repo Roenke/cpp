@@ -212,6 +212,8 @@ void start_my_tests()
 {
     my_vector_tests();
 
+    eq_cmp_tests();
+
     plus_tests();
     minus_tests();
     mul_tests();
@@ -224,5 +226,4 @@ void start_my_tests()
     from_string_test();
     to_string_tests();
     casts_tests();
-    eq_cmp_tests();
 }
