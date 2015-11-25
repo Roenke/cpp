@@ -3,7 +3,7 @@
 
 int main()
 {
-    start_all();
+    //start_all();
     start_my_tests();
     return 0;
 }

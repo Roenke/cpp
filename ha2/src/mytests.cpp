@@ -378,7 +378,13 @@ void abs_tests()
 
 void pow_tests()
 {
-    
+    lint num(324);
+
+    assert(pow(num, 1) == num);
+    assert(pow(num, 0) == 1);
+
+    auto result(pow(num, 67));
+    //assert(result.to_string() == "1608850477873393438550925367579398393660470992312595011124264875206840084023209828465699264821859558494021748709231957337229528619304918410007975008823181918635005313024");
 }
 
 void from_string_test()

@@ -216,6 +216,86 @@ bool lint::is_zero() const
     return sign_ == 0 && bits_ == nullptr;
 }
 
+bool apa::transform_plus(lint& l, lint const& r)
+{
+    if (l < 0 && r < 0)
+    {
+        l = -(-l + -r);
+        return true;
+    }
+
+    if (l < 0)
+    {
+        l = (-l < r) ? r - (-l) : -((-l) - r);
+        return true;
+    }
+
+    if (r < 0)
+    {
+        l = (-r < l) ? l - (-r) : -((-r) - l);
+        return true;
+    }
+
+    return false;
+}
+
+bool apa::transform_minus(lint& l, lint const& r)
+{
+    if (l == 0)
+    {
+        l = -l;
+        return true;
+    }
+
+    if (r == 0)
+    {
+        return true;
+    }
+
+    if (l > 0 && r > 0 && l < r)
+    {
+        l = -(r - l);
+        return true;
+    }
+
+    if (l < 0 && r > 0)
+    {
+        l = -(-l + r);
+        return true;
+    }
+
+    if (l > 0 && r < 0)
+    {
+        l = l + (-r);
+        return true;
+    }
+
+    if (r < 0 && l < 0)
+    {
+        l = abs(l) > abs(r) ? -(-l - (-r)) : -r - (-l);
+        return true;
+    }
+
+    return false;
+}
+
+bool apa::transdorm_div(lint& l, lint const& r)
+{
+    if (l < r)
+    {
+        l = 0;
+        return true;
+    }
+
+    if (l == r)
+    {
+        l = 1;
+        return true;
+    }
+
+    return false;
+}
+
 void lint::from_long_long(long long number)
 {
     if (number >= 0 && number <= static_cast<long long>(INT32_MAX) ||
@@ -373,37 +453,24 @@ bool apa::operator<=(lint const& l, lint const& r)
     return !(l > r);
 }
 
-lint& apa::operator+=(lint& l, lint const&r)
+lint& lint::operator+=(lint const&r)
 {
     // small object optimize
-    if(l.is_small() && r.is_small())
+    if(is_small() && r.is_small())
     {
-        auto result = static_cast<long long>(r.sign_) + l.sign_;
-        l.from_long_long(result);
-        return l;
+        auto result = static_cast<long long>(r.sign_) + sign_;
+        from_long_long(result);
+        return *this;
     }
 
-    if(l < 0 && r < 0)
+    if(transform_plus(*this, r))
     {
-        l = -(-l + -r);
-        return l;
+        return *this;
     }
 
-    if(l < 0)
+    if(is_small())
     {
-        l = (-l < r) ? r - (-l) : -((-l) - r);
-        return l;
-    }
-
-    if (r < 0)
-    {
-        l = (-r < l) ? l - (-r) : -((-r) - l);
-        return l;
-    }
-
-    if(l.is_small())
-    {
-        l.unpack();
+        unpack();
     }
 
     auto right(r);
@@ -412,132 +479,102 @@ lint& apa::operator+=(lint& l, lint const&r)
     int k = 0;
     uint32_t r_value;
     auto r_size = right.bits_->size();
-    for (size_t i = 0; i < std::max(l.bits_->size(), r_size) || k; ++i)
+    for (size_t i = 0; i < std::max(bits_->size(), r_size) || k; ++i)
     {
-        while (l.bits_->size() <= i)
+        while (bits_->size() <= i)
         {
-            l.bits_->push_back(0);
+            bits_->push_back(0);
         }
         
         r_value = (i < r_size ? (*right.bits_)[i] : 0);
-        (*l.bits_)[i] += k + r_value;
-        k = (*l.bits_)[i] >= lint::base;
-        if (k)  (*l.bits_)[i] -= lint::base;
+        (*bits_)[i] += k + r_value;
+        k = (*bits_)[i] >= lint::base;
+        if (k)  (*bits_)[i] -= lint::base;
     }
 
-    return l.try_to_small();
+    return try_to_small();
 }
 
-lint& apa::operator-=(lint& l, lint const&r)
+lint& apa::lint::operator-=(lint const&r)
 {
-    if(r.is_small() && l.is_small())
+    if(r.is_small() && is_small())
     {
-        auto result = static_cast<long long>(l.sign_) - r.sign_;
-        l.from_long_long(result);
-        return l;
+        auto result = static_cast<long long>(sign_) - r.sign_;
+        from_long_long(result);
+        return *this;
     }
 
-    if(l == 0)
+    if(transform_minus(*this, r))
     {
-        l = -l;
-        return l;
+        return *this;
     }
 
-    if(r == 0)
+    if (is_small())
     {
-        return l;
-    }
-
-    if (l.is_small())
-    {
-        l.unpack();
-    }
-
-    if(l > 0 && r > 0 && l < r)
-    {
-        l = -(r - l);
-        return l;
-    }
-
-    if(l < 0 && r > 0)
-    {
-        l = -(-l + r);
-        return l;
-    }
-
-    if(l > 0 && r < 0)
-    {
-        l = l + (-r);
-        return l;
-    }
-
-    if(r < 0 && l < 0)
-    {
-        l = abs(l) > abs(r) ? -(-l - (-r)) : -r - (-l);
-        return l;
+        unpack();
     }
 
     auto right(r);
     right.unpack();
-    if(right.bits_->size() > l.bits_->size())
+    if(right.bits_->size() > bits_->size())
     {
-        l.bits_->resize(right.bits_->size());
+        bits_->resize(right.bits_->size());
     }
 
     auto k = 0;
     int result;
     for (size_t i = 0; i < right.bits_->size() || k; ++i) 
     {
-        if(l.bits_->size() <= i)
+        if(bits_->size() <= i)
         {
-            l.bits_->push_back(0);
+            bits_->push_back(0);
         }
 
-        result = (*l.bits_)[i] - (k + (i < right.bits_->size() ? (*right.bits_)[i] : 0));
+        result = (*bits_)[i] - (k + (i < right.bits_->size() ? (*right.bits_)[i] : 0));
         k = result < 0;
         if (k)
         {
-            (*l.bits_)[i] = result + lint::base;
+            (*bits_)[i] = result + lint::base;
         }
         else
         {
-            (*l.bits_)[i] = result;
+            (*bits_)[i] = result;
         }
     }
 
-    while (l.bits_->size() > 1 && l.bits_->back() == 0)
-        l.bits_->pop_back();
+    while (bits_->size() > 1 && bits_->back() == 0)
+        bits_->pop_back();
 
-    return l.try_to_small();
+    return try_to_small();
 }
 
-lint& apa::operator*=(lint& l, lint const&r)
+lint& lint::operator*=(lint const& r)
 {
-    if(l.is_small() && r.is_small())
+    if (is_small() && r.is_small())
     {
-        long long value = r.sign_ * l.sign_;
-        l.from_long_long(value);
-        return l;
+        long long value = r.sign_ * sign_;
+        from_long_long(value);
+        return *this;
     }
 
-    if(l.is_small())
+    if (is_small())
     {
-        l.unpack();
+        unpack();
     }
 
     auto right(r);
     right.unpack();
-    
+
     lint c(0);
     c.unpack();
 
-    c.bits_->resize(l.bits_->size() + right.bits_->size());
-    c.sign_ = l.sign_ * right.sign_;
-    for (size_t i = 0; i < l.bits_->size(); ++i)
+    c.bits_->resize(bits_->size() + right.bits_->size());
+    c.sign_ = sign_ * right.sign_;
+    for (size_t i = 0; i < bits_->size(); ++i)
     {
         for (size_t j = 0, carry = 0; j < right.bits_->size() || carry; ++j)
         {
-            auto cur = (*c.bits_)[i + j] + (*l.bits_)[i] * 1ll * (j < right.bits_->size() ? (*right.bits_)[j] : 0) + carry;
+            auto cur = (*c.bits_)[i + j] + (*bits_)[i] * 1ll * (j < right.bits_->size() ? (*right.bits_)[j] : 0) + carry;
             (*c.bits_)[i + j] = static_cast<uint32_t>(cur % lint::base);
             carry = static_cast<int>(cur / lint::base);
         }
@@ -546,47 +583,40 @@ lint& apa::operator*=(lint& l, lint const&r)
     while (c.bits_->size() > 1 && c.bits_->back() == 0)
         c.bits_->pop_back();
 
-    l = c;
-    return l.try_to_small();
+    *this = c;
+    return try_to_small();
 }
 
-lint& apa::operator/=(lint& l, lint const& r)
+lint& lint::operator/=(lint const& r)
 {
-    if(r.is_small() && r == 0)
+    if (r.is_small() && r == 0)
     {
         (void)(23 / r.sign_);
     }
 
-    if(l.is_small() && r.is_small())
+    if (is_small() && r.is_small())
     {
-        auto value = l.sign_ / r.sign_;
-        l.from_long_long(value);
-        return l;
+        auto value = sign_ / r.sign_;
+        from_long_long(value);
+        return *this;
     }
 
-    if(r.is_small() && std::abs(r.sign_) < lint::base)
+    if (r.is_small() && std::abs(r.sign_) < lint::base)
     {
-        return l.small_division(r.sign_);
+        return small_division(r.sign_);
     }
 
-    if(l < r)
+    if(transdorm_div(*this, r))
     {
-        l = 0;
-        return l;
+        return *this;
     }
 
-    if(l == r)
+    if (is_small())
     {
-        l = 1;
-        return l;
+        unpack();
     }
 
-    if (l.is_small())
-    {
-        l.unpack();
-    }
 
-    
     lint left(1);
     auto right(r);
     right.unpack();
@@ -595,18 +625,18 @@ lint& apa::operator/=(lint& l, lint const& r)
     lint lc;
     lint lcp;
 
-    while(left <= right)
+    while (left <= right)
     {
         center = (left + right).small_division(2);
         lc = r * center;
         lcp = r * (center + 1);
-        bool lesser = lc < l;
-        if(lc == l || (lesser && lcp > l))
+        bool lesser = lc < *this;
+        if (lc == *this || (lesser && lcp > *this))
         {
-            l = center;
+            *this = center;
             break;
         }
-//        std::cout << center << std::endl;
+        //        std::cout << center << std::endl;
         if (lesser)
         {
             left = center + 1;
@@ -617,8 +647,8 @@ lint& apa::operator/=(lint& l, lint const& r)
         }
     }
 
-    l.sign_ *= r_sign;
-    return l.try_to_small();
+    sign_ *= r_sign;
+    return try_to_small();
 }
 
 lint apa::operator+(lint l, lint const& r)
@@ -661,20 +691,26 @@ lint apa::abs(lint const& other)
     return other > 0 ? other : -other;
 }
 
-lint apa::pow(lint& number, int degree)
+lint apa::pow(lint const& number, long long degree)
 {
-    auto result(number);
-    while(degree != 1)
+    lint result = 1;
+    auto acc = number;
+    if(degree == 0)
+    {
+        return 1;
+    }
+
+    while(degree != 0)
     {
         if(degree % 2 == 0)
         {
-            result *= result;
+            acc *= acc;
             degree /= 2;
         }
         else
         {
-            result *= number;
-            degree -= 1;
+            result *= acc;
+            --degree;
         }
     }
 

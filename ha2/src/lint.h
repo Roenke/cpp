@@ -33,10 +33,10 @@ namespace apa
         friend bool operator==(lint const&, lint const&);
         friend bool operator< (lint const&, lint const&);
 
-        friend lint& operator+=(lint&, lint const&);
-        friend lint& operator-=(lint&, lint const&);
-        friend lint& operator*=(lint&, lint const&);
-        friend lint& operator/=(lint&, lint const&);
+        lint& operator+=(lint const&);
+        lint& operator-=(lint const&);
+        lint& operator*=(lint const&);
+        lint& operator/=(lint const&);
 
     private:
         static uint64_t constexpr base = 1000 * 1000 * 1000;
@@ -66,19 +66,18 @@ namespace apa
     bool operator>=(lint const&, lint const&);
     bool operator<=(lint const&, lint const&);
 
-    lint& operator+=(lint&, lint const&);
-    lint& operator-=(lint&, lint const&);
-    lint& operator*=(lint&, lint const&);
-    lint& operator/=(lint&, lint const&);
-
     lint operator+(lint, lint const&);
     lint operator-(lint, lint const&);
     lint operator*(lint, lint const&);
     lint operator/(lint, lint const&);
 
+    bool transform_plus(lint&, lint const&);
+    bool transform_minus(lint&, lint const&);
+    bool transdorm_div(lint&, lint const&);
+
     std::ostream & operator<< (std::ostream & stream, lint const & d);
     std::istream & operator>> (std::istream & stream, lint & d);
 
     lint abs(lint const&);
-    lint pow(lint&, int);
+    lint pow(lint const&, long long);
 }; /* apa */
