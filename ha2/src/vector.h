@@ -14,10 +14,10 @@ namespace helpers
         vector<T>& operator=(vector<T> const&);
         ~vector();
 
-        T& operator[](int);
-        T const& operator[](int) const;
+        T& operator[](size_t);
+        T const& operator[](size_t) const;
         
-        void resize(int);
+        void resize(size_t);
 
         void push_back(T);
         T& pop_back();
@@ -89,7 +89,7 @@ helpers::vector<T>::~vector()
 }
 
 template <typename T>
-T& helpers::vector<T>::operator[](int index)
+T& helpers::vector<T>::operator[](size_t index)
 {
     if (index < 0 || index >= size_)
     {
@@ -100,7 +100,7 @@ T& helpers::vector<T>::operator[](int index)
 }
 
 template <typename T>
-T const& helpers::vector<T>::operator[](int index) const
+T const& helpers::vector<T>::operator[](size_t index) const
 {
     if(index < 0 || index >= size_)
     {
@@ -111,7 +111,7 @@ T const& helpers::vector<T>::operator[](int index) const
 }
 
 template <typename T>
-void helpers::vector<T>::resize(int new_size)
+void helpers::vector<T>::resize(size_t new_size)
 {
     if(new_size == size_)
     {
@@ -173,8 +173,6 @@ void helpers::vector<T>::allocate(int capacity = -1)
         capacity = capacity_ == 0 ? 2 : capacity_ * 2;
     }
 
-    assert(capacity >= size_);
-
     auto memory_region = new T[capacity];
     memset(memory_region, 0, sizeof(T) * capacity);
     if(content_ != nullptr)
@@ -216,10 +214,10 @@ bool helpers::operator==(vector<T> const& l, vector<T> const& r)
 template <typename T>
 int helpers::cmp_bits(vector<T> const& l, vector<T> const&r)
 {
-    auto l_size = l.size();
-    auto r_size = r.size();
+    int l_size = l.size();
+    int r_size = r.size();
     auto max_size = std::max(l_size, r_size);
-    for (int i = max_size - 1; i >= 0; --i)
+    for (auto i = max_size - 1; i >= 0; --i)
     {
         if (i < l_size && i >= r_size)
         {

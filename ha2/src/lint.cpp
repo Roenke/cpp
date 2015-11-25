@@ -228,8 +228,8 @@ void lint::from_long_long(long long number)
         sign_ = number > 0 ? 1 : -1;
         number *= sign_;
         bits_ = new vector<uint32_t>(2);
-        (*bits_)[0] = number % base;
-        (*bits_)[1] = number / base;
+        (*bits_)[0] = static_cast<uint32_t>(number % base);
+        (*bits_)[1] = static_cast<uint32_t>(number / base);
     }
 }
 
@@ -240,7 +240,7 @@ lint& lint::try_to_small()
         return *this;
     }
 
-    for (int i = 2; i < bits_->size(); ++i)
+    for (size_t i = 2; i < bits_->size(); ++i)
     {
         if ((*bits_)[i] != 0)
             return *this;
@@ -533,13 +533,13 @@ lint& apa::operator*=(lint& l, lint const&r)
 
     c.bits_->resize(l.bits_->size() + right.bits_->size());
     c.sign_ = l.sign_ * right.sign_;
-    for (auto i = 0; i < l.bits_->size(); ++i)
+    for (size_t i = 0; i < l.bits_->size(); ++i)
     {
-        for (auto j = 0, carry = 0; j < right.bits_->size() || carry; ++j)
+        for (size_t j = 0, carry = 0; j < right.bits_->size() || carry; ++j)
         {
-            long long cur = (*c.bits_)[i + j] + (*l.bits_)[i] * 1ll * (j < right.bits_->size() ? (*right.bits_)[j] : 0) + carry;
-            (*c.bits_)[i + j] = (uint32_t)(cur % lint::base);
-            carry = cur / lint::base;
+            auto cur = (*c.bits_)[i + j] + (*l.bits_)[i] * 1ll * (j < right.bits_->size() ? (*right.bits_)[j] : 0) + carry;
+            (*c.bits_)[i + j] = static_cast<uint32_t>(cur % lint::base);
+            carry = static_cast<int>(cur / lint::base);
         }
     }
 

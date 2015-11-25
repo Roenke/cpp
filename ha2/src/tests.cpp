@@ -1,3 +1,4 @@
+#pragma warning(push, 0) 
 #include <iostream>
 #include <sstream>
 #include <assert.h>
@@ -146,3 +147,4 @@ void start_all()
     test_io();
     failed_conversions_test();
 }
+#pragma warning(pop)
