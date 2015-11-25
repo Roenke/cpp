@@ -125,6 +125,7 @@ void helpers::vector<T>::resize(int new_size)
     }
 
     allocate(new_size);
+    size_ = new_size;
 }
 
 template <typename T>

@@ -455,17 +455,17 @@ lint& apa::operator*=(lint& l, lint const&r)
     lint c(0);
     c.unpack();
 
-    for (auto i = 0; i < l.bits_->size(); ++i)
-        for (auto j = 0, carry = 0; j < right.bits_->size() || carry; ++j) {
-            while (c.bits_->size() <= i + j)
-            {
-                c.bits_->push_back(0);
-            }
+    c.bits_->resize(l.bits_->size() + right.bits_->size());
 
+    for (auto i = 0; i < l.bits_->size(); ++i)
+    {
+        for (auto j = 0, carry = 0; j < right.bits_->size() || carry; ++j)
+        {
             long long cur = (*c.bits_)[i + j] + (*l.bits_)[i] * 1ll * (j < right.bits_->size() ? (*right.bits_)[j] : 0) + carry;
-            (*c.bits_)[i + j] = (uint32_t) (cur % lint::base);
+            (*c.bits_)[i + j] = (uint32_t)(cur % lint::base);
             carry = cur / lint::base;
         }
+    }
 
     while (c.bits_->size() > 1 && c.bits_->back() == 0)
         c.bits_->pop_back();
