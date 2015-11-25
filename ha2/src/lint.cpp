@@ -49,18 +49,7 @@ lint::lint(long long number)
     : sign_(0)
     , bits_(nullptr)
 {
-    if(number > 0 && number <= static_cast<long long>(INT32_MAX) ||
-        number < 0 && number >= static_cast<long long>(INT32_MIN))
-    {
-        sign_ = static_cast<int>(number);
-    }
-    else
-    {
-        sign_ = number > 0 ? 1 : -1;
-        bits_ = new vector<uint32_t>(2);
-        (*bits_)[0] = number % base;
-        (*bits_)[1] = number / base;
-    }
+    from_long_long(number);
 }
 
 lint::lint(double number)
@@ -151,6 +140,60 @@ std::string lint::to_string() const
     }
 
     return ost.str();
+}
+
+void lint::unpack()
+{
+    if(!is_small())
+    {
+        return;
+    }
+    
+    auto value = sign_;
+    sign_ = sign_ >= 0 ? 1 : -1;
+
+    bits_ = new vector<uint32_t>(2);
+    (*bits_)[0] = value % base;
+    (*bits_)[1] = value / base;
+}
+
+bool lint::is_zero() const
+{
+    return sign_ == 0 && bits_ == nullptr;
+}
+
+void lint::from_long_long(long long number)
+{
+    if (number >= 0 && number <= static_cast<long long>(INT32_MAX) ||
+        number < 0 && number >= static_cast<long long>(INT32_MIN))
+    {
+        sign_ = static_cast<int>(number);
+    }
+    else
+    {
+        sign_ = number > 0 ? 1 : -1;
+        bits_ = new vector<uint32_t>(2);
+        (*bits_)[0] = number % base;
+        (*bits_)[1] = number / base;
+    }
+}
+
+lint& lint::try_to_small()
+{
+    if(is_small() || bits_->size() != 1)
+    {
+        return *this;
+    }
+
+    if(sign_ == 1 && (*bits_)[0] <= INT32_MAX ||
+        sign_ == -1 && (*bits_)[0] <= -INT32_MIN)
+    {
+        sign_ = sign_ * static_cast<int>((*bits_)[0]);
+        delete bits_;
+        bits_ = nullptr;
+    }
+
+    return *this;
 }
 
 void lint::assert_optimization() const
@@ -265,14 +308,77 @@ bool apa::operator<=(lint const& l, lint const& r)
 lint& apa::operator+=(lint& l, lint const&r)
 {
     // stub. Todo: implement
+    int k = 0;
+    
+    // small object optimize
+    if(l.is_small() && r.is_small())
+    {
+        long long result = r.sign_ + l.sign_;
+        l.from_long_long(result);
+        return l;
+    }
 
-    return l;
+    if(l.is_small())
+    {
+        l.unpack();
+    }
+
+    auto right(r);
+    right.unpack();
+
+    uint32_t r_value;
+    auto r_size = right.bits_->size();
+    for (size_t i = 0; i < std::max(l.bits_->size(), r_size) || k; ++i)
+    {
+        if (i == l.bits_->size())
+        {
+            l.bits_->push_back(0);
+        }
+        
+        r_value = (i < r_size ? (*right.bits_)[i] : 0);
+        (*l.bits_)[i] += k + r_value;
+        k = (*l.bits_)[i] >= lint::base;
+        if (k)  (*l.bits_)[i] -= lint::base;
+    }
+
+    return l.try_to_small();
 }
 
 lint& apa::operator-=(lint& l, lint const&r)
 {
-    // stub. Todo: implement
-    return l;
+    if(r.is_small() && l.is_small())
+    {
+        long long result = l.sign_ - r.sign_;
+        l.from_long_long(result);
+        return l;
+    }
+
+    if (l.is_small())
+    {
+        l.unpack();
+    }
+
+    auto right(r);
+    right.unpack();
+
+    auto k = 0;
+    int result;
+    for (size_t i = 0; i < right.bits_->size() || k; ++i) {
+        result = (*l.bits_)[i] - (k + (i < right.bits_->size() ? (*right.bits_)[i] : 0));
+        k = result < 0;
+        if (k)
+        {
+            (*l.bits_)[i] = result + lint::base;
+        }
+        else
+        {
+            (*l.bits_)[i] = result;
+        }
+    }
+    while (l.bits_->size() > 1 && l.bits_->back() == 0)
+        l.bits_->pop_back();
+
+    return l.try_to_small();
 }
 
 lint& apa::operator*=(lint& l, lint const&r)

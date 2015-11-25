@@ -40,12 +40,37 @@ void casts_tests()
 
 void plus_tests()
 {
-    
+    lint num1(1);
+    lint num2(1000);
+    lint num3("10000000000000000");
+    lint num4("10000000000000001");
+    assert(num1 + num2 == 1001);
+    assert(num1 + num3 == num4);
+    assert(num2 + num1 == 1001);
+    assert((num3 + num2).to_string() == "10000000000001000");
+    auto num5 = num3 + num4;
+    assert(num5.to_string() == "20000000000000001");
+
+    std::cout << "Sum tests passed" << std::endl;
 }
 
 void minus_tests()
 {
-    
+    lint num1(1000);
+    lint num2("3984759834570309328349759834754");
+    lint num3("8934769679583758672945879243653248740723658749856747564248765783249834263428484275248754");
+
+    assert((num1 - 1).to_string() == "999");
+    assert(num1 - 0 == num1);
+    assert((num2 - num1).to_string() == "3984759834570309328349759833754");
+    auto big_result(num3 - num2);
+
+    assert(big_result + num2 == num3);
+    assert(big_result - 0 == big_result);
+    auto zero(big_result - big_result);
+    assert(zero == 0);
+    assert((big_result - big_result).is_small());
+    assert(big_result.to_string() == "8934769679583758672945879243653248740723658749856747564244781023415263954100134515414000");
 }
 
 void mul_tests()
@@ -114,6 +139,17 @@ void cmp_tests()
     assert(-(-neg_bil) == neg_bil);
     assert(bil != -bil);
     assert(bil > neg_bil);
+    
+    lint big(3000000000LL);
+
+    assert(bil != big);
+    assert(1 != big);
+    assert(1 < big);
+    assert(-big < big);
+    assert(-big == lint("-3000000000"));
+    assert(-1 != -bil);
+    assert(1000000001 == bil);
+
 
     std::cout << "Compare tests passed" << std::endl;
 }
@@ -130,7 +166,19 @@ void decrement_tests()
 
 void abs_tests()
 {
-    
+    lint zero(0);
+    lint positive_small(1000);
+    lint negative_small(-1000);
+    lint positive_big("38726823756438756");
+    lint negative_big("-38726823756438756");
+
+    assert(abs(zero) == 0);
+    assert(abs(positive_small) >= 0);
+    assert(abs(negative_big) >= 0);
+    assert(abs(negative_small) >= 0);
+    assert(abs(positive_big) >= 0);
+    assert(abs(negative_big) == positive_big);
+    assert(abs(negative_small) == positive_small);
 }
 
 void pow_tests()
@@ -206,6 +254,9 @@ void to_string_tests()
     lint num4("-34554654897934534543534");
     auto str4 = num4.to_string();
     assert(str4 == "-34554654897934534543534");
+
+    assert(lint("8934769679583758672945879243653248740723658749856747564248765783249834263428484275248754").to_string() ==
+        "8934769679583758672945879243653248740723658749856747564248765783249834263428484275248754");
 }
 
 void start_my_tests()

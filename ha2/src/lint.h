@@ -43,6 +43,10 @@ namespace apa
         int sign_;
         helpers::vector<uint32_t>* bits_;
 
+        void unpack(); // unsafe method.
+        bool is_zero() const;
+        void from_long_long(long long);
+        lint& try_to_small();
         void assert_optimization() const;
     };
 
