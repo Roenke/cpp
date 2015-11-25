@@ -82,7 +82,40 @@ void eq_cmp_tests()
 
 void cmp_tests()
 {
-    
+    lint num1(123);
+    lint num3(1324);
+    lint num2("38457984573489057349857439876");
+
+    assert(num1 == num1);
+
+    assert(num1 < num3);
+    assert(num3 >= num1);
+    assert(num3 > num1);
+    assert(num1 <= num3);
+    assert(num1 != num3);
+
+    assert(num1 < num2);
+    assert(num1 <= num2);
+    assert(num2 >= num1);
+    assert(!(num2 < num2));
+    assert(num2 <= num2);
+
+    lint bil(1000000001);
+
+    assert(bil > 1);
+    assert(1 < bil);
+    assert(bil >= 1);
+    assert(bil > num1);
+    assert(bil < num2);
+    assert(num2 >= bil);
+
+    auto neg_bil(-bil);
+    assert(bil == -neg_bil);
+    assert(-(-neg_bil) == neg_bil);
+    assert(bil != -bil);
+    assert(bil > neg_bil);
+
+    std::cout << "Compare tests passed" << std::endl;
 }
 
 void increment_tests()

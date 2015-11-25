@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cassert>
+#include <algorithm>
 
 namespace helpers
 {
@@ -12,14 +13,15 @@ namespace helpers
         explicit vector(int);
         vector(vector<T> const&);
         vector<T>& operator=(vector<T> const&);
+        ~vector();
 
         T& operator[](int);
+        T const& operator[](int) const;
         
         void push_back(T);
         T& pop_back();
         T const& back();
         size_t size() const;
-
     private:
         uint32_t size_;
         uint32_t capacity_;
@@ -31,6 +33,9 @@ namespace helpers
 
     template<typename T>
     bool operator==(vector<T> const&, vector<T> const&);
+
+    template<typename T>
+    int cmp_bits(helpers::vector<T>const&, helpers::vector<T> const&);
     
 }; /* helpers */
 
@@ -77,7 +82,19 @@ helpers::vector<T>& helpers::vector<T>::operator=(vector<T> const& other)
 }
 
 template <typename T>
+helpers::vector<T>::~vector()
+{
+    delete[] content_;
+}
+
+template <typename T>
 T& helpers::vector<T>::operator[](int index)
+{
+    return content_[index];
+}
+
+template <typename T>
+T const& helpers::vector<T>::operator[](int index) const
 {
     return content_[index];
 }
@@ -160,3 +177,35 @@ bool helpers::operator==(vector<T> const& l, vector<T> const& r)
     }
 }
 
+template <typename T>
+int helpers::cmp_bits(vector<T> const& l, vector<T> const&r)
+{
+    auto l_size = l.size();
+    auto r_size = r.size();
+    auto max_size = std::max(l_size, r_size);
+    for (int i = max_size - 1; i >= 0; --i)
+    {
+        if (i < l_size && i >= r_size)
+        {
+            if (l[i] > 0)
+            {
+                return -1;
+            }
+        }
+
+        if (i < r_size && i >= l_size)
+        {
+            if (r[i] > 0)
+            {
+                return 1;
+            }
+        }
+
+        if (l[i] != r[i])
+        {
+            return l[i] < r[i] ? 1 : -1;
+        }
+    }
+
+    return 0;
+}

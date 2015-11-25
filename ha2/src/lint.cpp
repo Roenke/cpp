@@ -254,12 +254,35 @@ bool apa::operator!=(lint const& l, lint const& r)
 // stub
 bool apa::operator<(lint const& l, lint const& r)
 {
-    if(l.bits_ == nullptr && r.bits_ == nullptr)
+    if (l.sign_ < r.sign_)
     {
-        return l.sign_ < r.sign_;
+        return true;
     }
 
-    return false;
+    if(r.sign_ < l.sign_)
+    {
+        return false;
+    }
+
+    // r.sign == l.sign
+
+    // Одно из чисел котороткое
+
+    if (l.bits_ == nullptr)
+    {
+        return l.sign_ == 1;
+    }
+
+    if (r.bits_ == nullptr)
+    {
+        return r.sign_ == -1;
+    }
+
+    // Оба длинные и одного знака
+
+    auto cmp_result = cmp_bits(*l.bits_, *r.bits_);
+
+    return cmp_result == r.sign_;
 }
 
 bool apa::operator>(lint const& l, lint const& r)
