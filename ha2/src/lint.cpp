@@ -219,13 +219,14 @@ bool lint::is_zero() const
 void lint::from_long_long(long long number)
 {
     if (number >= 0 && number <= static_cast<long long>(INT32_MAX) ||
-        number < 0 && number >= static_cast<long long>(INT32_MIN))
+        number < 0 && number >= static_cast<long long>(-INT32_MAX))
     {
         sign_ = static_cast<int>(number);
     }
     else
     {
         sign_ = number > 0 ? 1 : -1;
+        number *= sign_;
         bits_ = new vector<uint32_t>(2);
         (*bits_)[0] = number % base;
         (*bits_)[1] = number / base;
@@ -234,15 +235,28 @@ void lint::from_long_long(long long number)
 
 lint& lint::try_to_small()
 {
-    if(is_small() || bits_->size() != 1)
+    if(is_small())
     {
         return *this;
     }
 
-    if(sign_ == 1 && (*bits_)[0] <= INT32_MAX ||
-        sign_ == -1 && (*bits_)[0] <= -INT32_MIN)
+    for (int i = 2; i < bits_->size(); ++i)
     {
-        sign_ = sign_ * static_cast<int>((*bits_)[0]);
+        if ((*bits_)[i] != 0)
+            return *this;
+    }
+
+    auto value = static_cast<long long>((*bits_)[0]);
+
+    if(bits_->size() >= 2)
+    {
+        value += (*bits_)[1] * base;
+    }
+
+    if(sign_ == 1 && value <= INT32_MAX ||
+        sign_ == -1 && value >= -INT32_MAX)
+    {
+        sign_ = sign_ * static_cast<int>(value);
         delete bits_;
         bits_ = nullptr;
     }
@@ -289,7 +303,7 @@ lint apa::operator--(lint& value, int)
 {
     auto old_value(value);
 
-    value += 1;
+    value -= 1;
     return old_value;
 }
 
@@ -361,13 +375,10 @@ bool apa::operator<=(lint const& l, lint const& r)
 
 lint& apa::operator+=(lint& l, lint const&r)
 {
-    // stub. Todo: implement
-    int k = 0;
-    
     // small object optimize
     if(l.is_small() && r.is_small())
     {
-        long long result = r.sign_ + l.sign_;
+        auto result = static_cast<long long>(r.sign_) + l.sign_;
         l.from_long_long(result);
         return l;
     }
@@ -381,11 +392,13 @@ lint& apa::operator+=(lint& l, lint const&r)
     if(l < 0)
     {
         l = (-l < r) ? r - (-l) : -((-l) - r);
+        return l;
     }
 
     if (r < 0)
     {
         l = (-r < l) ? l - (-r) : -((-r) - l);
+        return l;
     }
 
     if(l.is_small())
@@ -396,6 +409,7 @@ lint& apa::operator+=(lint& l, lint const&r)
     auto right(r);
     right.unpack();
 
+    int k = 0;
     uint32_t r_value;
     auto r_size = right.bits_->size();
     for (size_t i = 0; i < std::max(l.bits_->size(), r_size) || k; ++i)
@@ -418,14 +432,48 @@ lint& apa::operator-=(lint& l, lint const&r)
 {
     if(r.is_small() && l.is_small())
     {
-        long long result = l.sign_ - r.sign_;
+        auto result = static_cast<long long>(l.sign_) - r.sign_;
         l.from_long_long(result);
+        return l;
+    }
+
+    if(l == 0)
+    {
+        l = -l;
+        return l;
+    }
+
+    if(r == 0)
+    {
         return l;
     }
 
     if (l.is_small())
     {
         l.unpack();
+    }
+
+    if(l > 0 && r > 0 && l < r)
+    {
+        l = r - l;
+        return l;
+    }
+
+    if(l < 0 && r > 0)
+    {
+        l = -(-l + r);
+        return l;
+    }
+
+    if(l > 0 && r < 0)
+    {
+        l = l + (-r);
+        return l;
+    }
+
+    if(r < 0 && l < 0)
+    {
+        l = abs(l) > abs(r) ? -(-l - (-r)) : -r - (-l);
     }
 
     auto right(r);
@@ -594,7 +642,7 @@ std::istream& apa::operator>>(std::istream& stream, lint& d)
     return stream;
 }
 
-lint apa::abs(lint& other)
+lint apa::abs(lint const& other)
 {
     return other > 0 ? other : -other;
 }

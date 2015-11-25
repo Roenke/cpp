@@ -80,6 +80,6 @@ namespace apa
     std::ostream & operator<< (std::ostream & stream, lint const & d);
     std::istream & operator>> (std::istream & stream, lint & d);
 
-    lint abs(lint&);
+    lint abs(lint const&);
     lint pow(lint&, int);
 }; /* apa */

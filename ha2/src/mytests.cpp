@@ -3,9 +3,15 @@
 #include "vector.h"
 #include <cassert>
 #include <iostream>
+#include <fstream>
 
 using namespace apa;
 using helpers::vector;
+
+void great_test()
+{
+    std::ifstream file("")
+}
 
 void casts_tests()
 {
@@ -18,10 +24,10 @@ void casts_tests()
     lint my(short_long);
     assert(my.is_small());
 
-    long long min_int = INT32_MIN;
+    long long min_int = -INT32_MAX;
     long long max_int = INT32_MAX;
     auto max_int_overflow = INT32_MAX + 1LL;
-    auto min_int_overflow = INT32_MIN - 1LL;
+    auto min_int_overflow = -INT32_MAX - 1LL;
     lint my_big(max_int);
     lint my_small(min_int);
     lint my_big_overflow(max_int_overflow);
@@ -50,6 +56,21 @@ void plus_tests()
     assert((num3 + num2).to_string() == "10000000000001000");
     auto num5 = num3 + num4;
     assert(num5.to_string() == "20000000000000001");
+
+    lint p1(1);
+    lint p2(2);
+    lint n1(-1);
+    lint n2(-2);
+    assert(p1 + p2 == 3);
+    assert(p2 - p1 == 1);
+    assert(p1 - p2 == -1);
+    assert(p1 + n1 == 0);
+    assert(p1 + n2 == -1);
+    assert(p2 + n1 == 1);
+    assert(n1 + n2 == -3);
+    assert(n1 - n2 == 1);
+    assert(n1 - n1 == 0);
+    assert(n2 - n1 == -1);
 
     std::cout << "Sum tests passed" << std::endl;
 }
@@ -201,12 +222,14 @@ void increment_tests()
     lint one(1);
     lint two(0);
     lint three(10);
-    lint minimum(INT32_MIN);
+    lint minimum(-INT32_MAX);
     lint maximum(INT32_MAX);
 
-    assert(minimum-- == INT32_MIN);
+    assert(minimum.is_small());
+    assert(minimum-- == -INT32_MAX);
     assert(!minimum.is_small());
-    assert(++minimum == INT32_MIN);
+
+    assert(++minimum == -INT32_MAX);
     assert(minimum.is_small());
     assert(two-- == 0);
     assert(--(--one) == two);
@@ -331,8 +354,8 @@ void start_my_tests()
     cmp_tests();
     mul_tests();
     
-    //increment_tests();
-   decrement_tests(); 
+    increment_tests();
+    decrement_tests(); 
     abs_tests();
     pow_tests();
     from_string_test();
