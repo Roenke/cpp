@@ -119,7 +119,8 @@ void div_tests()
 
     lint b2("8347984757923738474983794");
     lint res2("9999");
-    assert(a / b2 == res2);
+    lint res3(a / b2);
+    assert(res3 == res2);
 
     std::cout << "Division tests passed" << std::endl;
 }

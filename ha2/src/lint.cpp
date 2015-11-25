@@ -372,6 +372,22 @@ lint& apa::operator+=(lint& l, lint const&r)
         return l;
     }
 
+    if(l < 0 && r < 0)
+    {
+        l = -(-l + -r);
+        return l;
+    }
+
+    if(l < 0)
+    {
+        l = (-l < r) ? r - (-l) : -((-l) - r);
+    }
+
+    if (r < 0)
+    {
+        l = (-r < l) ? l - (-r) : -((-r) - l);
+    }
+
     if(l.is_small())
     {
         l.unpack();
@@ -414,10 +430,15 @@ lint& apa::operator-=(lint& l, lint const&r)
 
     auto right(r);
     right.unpack();
+    if(right.bits_->size() > l.bits_->size())
+    {
+        l.bits_->resize(right.bits_->size());
+    }
 
     auto k = 0;
     int result;
-    for (size_t i = 0; i < right.bits_->size() || k; ++i) {
+    for (size_t i = 0; i < right.bits_->size() || k; ++i) 
+    {
         result = (*l.bits_)[i] - (k + (i < right.bits_->size() ? (*right.bits_)[i] : 0));
         k = result < 0;
         if (k)
@@ -429,6 +450,7 @@ lint& apa::operator-=(lint& l, lint const&r)
             (*l.bits_)[i] = result;
         }
     }
+
     while (l.bits_->size() > 1 && l.bits_->back() == 0)
         l.bits_->pop_back();
 
@@ -515,10 +537,10 @@ lint& apa::operator/=(lint& l, lint const& r)
     while(left <= right)
     {
         center = (left + right).small_division(2);
-        lc = l * center;
-        lcp = l * (center + 1);
-        bool lesser = lc < r;
-        if(lc == r || (lesser && lcp > r))
+        lc = r * center;
+        lcp = r * (center + 1);
+        bool lesser = lc < l;
+        if(lc == l || (lesser && lcp > l))
         {
             l = center;
             break;
