@@ -552,7 +552,7 @@ lint& lint::operator*=(lint const& r)
 {
     if (is_small() && r.is_small())
     {
-        long long value = r.sign_ * sign_;
+        auto value = static_cast<long long>(r.sign_) * sign_;
         from_long_long(value);
         return *this;
     }
