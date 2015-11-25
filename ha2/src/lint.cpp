@@ -1,6 +1,7 @@
 #include "lint.h"
 #include <sstream>
 #include <string>
+#include <iostream>
 
 using namespace apa;
 using helpers::vector;
@@ -56,6 +57,14 @@ lint::lint(double number)
     : lint(std::to_string(number).substr(0, std::to_string(number).find('.')))
 {}
 
+lint::~lint()
+{
+    if(bits_ != nullptr)
+    {
+        delete bits_;
+    }
+}
+
 lint::lint(lint const& other)
     : sign_(other.sign_)
     , bits_(nullptr)
@@ -96,8 +105,23 @@ lint::operator long long() const
     return sign_;
 }
 
-lint& lint::operator=(lint const& from)
+lint& lint::operator=(lint const& other)
 {
+    if(other.bits_ != nullptr)
+    {
+        if(bits_ != nullptr)
+        {
+            *bits_ = *other.bits_;
+        }
+        
+        bits_ = new vector<uint32_t>(*other.bits_);
+    }
+    else
+    {
+        bits_ = nullptr;
+    }
+    
+    sign_ = other.sign_;
     return *this;
 }
 
@@ -140,6 +164,36 @@ std::string lint::to_string() const
     }
 
     return ost.str();
+}
+
+lint& lint::small_division(int num)
+{
+    if (std::abs(num) >= base)
+    {
+        return *this /= lint(num);
+    }
+
+    if (is_small())
+    {
+        sign_ /= num;
+        return *this;
+    }
+    if (num < 0)
+    {
+        sign_ *= -1;
+        num *= -1;
+    }
+
+    auto carry = 0;
+    for (int i = bits_->size() - 1; i >= 0; --i) {
+        long long cur = (*bits_)[i] + carry * 1ll * base;
+        (*bits_)[i] = int(cur / num);
+        carry = int(cur % num);
+    }
+    while (bits_->size() > 1 && bits_->back() == 0)
+        bits_->pop_back();
+
+    return *this;
 }
 
 void lint::unpack()
@@ -287,7 +341,7 @@ bool apa::operator<(lint const& l, lint const& r)
 
     auto cmp_result = cmp_bits(*l.bits_, *r.bits_);
 
-    return cmp_result == -r.sign_;
+    return cmp_result == r.sign_;
 }
 
 bool apa::operator>(lint const& l, lint const& r)
@@ -330,7 +384,7 @@ lint& apa::operator+=(lint& l, lint const&r)
     auto r_size = right.bits_->size();
     for (size_t i = 0; i < std::max(l.bits_->size(), r_size) || k; ++i)
     {
-        if (i == l.bits_->size())
+        while (l.bits_->size() <= i)
         {
             l.bits_->push_back(0);
         }
@@ -383,14 +437,104 @@ lint& apa::operator-=(lint& l, lint const&r)
 
 lint& apa::operator*=(lint& l, lint const&r)
 {
-    // stub. Todo: implement
-    return l;
+    if(l.is_small() && r.is_small())
+    {
+        long long value = r.sign_ * l.sign_;
+        l.from_long_long(value);
+        return l;
+    }
+
+    if(l.is_small())
+    {
+        l.unpack();
+    }
+
+    auto right(r);
+    right.unpack();
+    
+    lint c(0);
+    c.unpack();
+
+    for (auto i = 0; i < l.bits_->size(); ++i)
+        for (auto j = 0, carry = 0; j < right.bits_->size() || carry; ++j) {
+            while (c.bits_->size() <= i + j)
+            {
+                c.bits_->push_back(0);
+            }
+
+            long long cur = (*c.bits_)[i + j] + (*l.bits_)[i] * 1ll * (j < right.bits_->size() ? (*right.bits_)[j] : 0) + carry;
+            (*c.bits_)[i + j] = (uint32_t) (cur % lint::base);
+            carry = cur / lint::base;
+        }
+
+    while (c.bits_->size() > 1 && c.bits_->back() == 0)
+        c.bits_->pop_back();
+
+    l = c;
+    return l.try_to_small();
 }
 
 lint& apa::operator/=(lint& l, lint const& r)
 {
-    // stub. Todo: implement
-    return l;
+    if(l.is_small() && r.is_small())
+    {
+        auto value = l.sign_ / r.sign_;
+        l.from_long_long(value);
+        return l;
+    }
+
+    if(r.is_small() && std::abs(r.sign_) < lint::base)
+    {
+        return l.small_division(r.sign_);
+    }
+
+    if(l < r)
+    {
+        l = 0;
+        return l;
+    }
+
+    if(l == r)
+    {
+        l = 1;
+        return l;
+    }
+
+    if (l.is_small())
+    {
+        l.unpack();
+    }
+
+    lint left(1);
+    auto right(r);
+    right.unpack();
+    lint center;
+    lint lc;
+    lint lcp;
+
+    while(left <= right)
+    {
+        center = (left + right).small_division(2);
+        lc = l * center;
+        lcp = l * (center + 1);
+        bool lesser = lc < r;
+        if(lc == r || (lesser && lcp > r))
+        {
+            l = center;
+            break;
+        }
+        std::cout << center.to_string() << std::endl;
+        if (lesser)
+        {
+            left = center + 1;
+        }
+        else
+        {
+            right = center - 1;
+        }
+    }
+
+    return l.try_to_small();
 }
 
 lint apa::operator+(lint l, lint const& r)
@@ -415,11 +559,16 @@ lint apa::operator/(lint l, lint const&r)
 
 std::ostream& apa::operator<<(std::ostream& stream, lint const& d)
 {
+    stream << d.to_string();
     return stream;
 }
 
 std::istream& apa::operator>>(std::istream& stream, lint& d)
 {
+    std::string stream_data;
+    stream >> stream_data;
+    lint new_value(stream_data);
+    d = new_value;
     return stream;
 }
 

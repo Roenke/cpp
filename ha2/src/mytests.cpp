@@ -71,16 +71,57 @@ void minus_tests()
     assert(zero == 0);
     assert((big_result - big_result).is_small());
     assert(big_result.to_string() == "8934769679583758672945879243653248740723658749856747564244781023415263954100134515414000");
+
+    std::cout << "subtraction tests passed" << std::endl;
 }
 
 void mul_tests()
 {
-    
+    lint num1(1);
+    lint num2(0);
+    lint num3(10000);
+    lint num4("892374984372368436589379843");
+    lint num5("93488762387648723784687732");
+
+    assert(num1 * num2 == 0);
+    assert(num1 * 1 == num1);
+    assert(num3 * num3 == 100000000);
+    assert(num4 * 0 == 0);
+    assert((num5 * 0).is_small());
+    assert((num5 * num4).to_string() == "83427032874670095973945907379893169476596773290186076");
+
+    std::cout << "mult tests passed" << std::endl;
 }
 
 void div_tests()
 {
-    
+    lint num1(1000);
+    lint num2(500);
+
+    assert(num1 / num2 == 2);
+    assert(num2 / num1 == 0);
+
+    lint num3("100000000000000000000000000000000000000000000");
+    assert((num3 / num1).to_string() == "100000000000000000000000000000000000000000");
+    assert(num2 / num3 == 0);
+
+    num3 /= num3;
+    assert(num3 == 1);
+    assert(num3.is_small());
+
+    lint result("93432687672");
+    lint a("83479847573967384749837946456");
+    lint b("893475823647893678");
+
+    auto res = a / b;
+    assert(res == result);
+    assert(!(a / b).is_small());
+
+    lint b2("8347984757923738474983794");
+    lint res2("9999");
+    assert(a / b2 == res2);
+
+    std::cout << "Division tests passed" << std::endl;
 }
 
 void eq_cmp_tests()
@@ -156,7 +197,25 @@ void cmp_tests()
 
 void increment_tests()
 {
-    
+    lint one(1);
+    lint two(0);
+    lint three(10);
+    lint minimum(INT32_MIN);
+    lint maximum(INT32_MAX);
+
+    assert(minimum-- == INT32_MIN);
+    assert(!minimum.is_small());
+    assert(++minimum == INT32_MIN);
+    assert(minimum.is_small());
+    assert(two-- == 0);
+    assert(--(--one) == two);
+    assert(maximum++ == INT32_MAX);
+    assert(!maximum.is_small());
+    assert(maximum-- != INT32_MAX);
+    assert(maximum == INT32_MAX);
+    assert(maximum.is_small());
+
+    std::cout << "Increment tests passed" << std::endl;
 }
 
 void decrement_tests()
@@ -267,11 +326,12 @@ void start_my_tests()
 
     plus_tests();
     minus_tests();
-    mul_tests();
     div_tests();
     cmp_tests();
-    increment_tests();
-    decrement_tests(); 
+    mul_tests();
+    
+    //increment_tests();
+   decrement_tests(); 
     abs_tests();
     pow_tests();
     from_string_test();

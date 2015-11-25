@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include <cassert>
 #include <algorithm>
 
@@ -18,17 +17,19 @@ namespace helpers
         T& operator[](int);
         T const& operator[](int) const;
         
+        void resize(int);
+
         void push_back(T);
         T& pop_back();
         T const& back();
         size_t size() const;
     private:
-        uint32_t size_;
-        uint32_t capacity_;
+        size_t size_;
+        size_t capacity_;
         
         T* content_;
 
-        void allocate(size_t new_capacity = -1);
+        void allocate(int new_capacity = -1);
     };
 
     template<typename T>
@@ -90,19 +91,46 @@ helpers::vector<T>::~vector()
 template <typename T>
 T& helpers::vector<T>::operator[](int index)
 {
+    if (index < 0 || index >= size_)
+    {
+        throw std::exception("Index out of range");
+    }
+
     return content_[index];
 }
 
 template <typename T>
 T const& helpers::vector<T>::operator[](int index) const
 {
+    if(index < 0 || index >= size_)
+    {
+        throw std::exception("Index out of range");
+    }
+
     return content_[index];
+}
+
+template <typename T>
+void helpers::vector<T>::resize(int new_size)
+{
+    if(new_size == size_)
+    {
+        return;
+    }
+
+    if(new_size < size_)
+    {
+        size_ = new_size;
+        return;
+    }
+
+    allocate(new_size);
 }
 
 template <typename T>
 void helpers::vector<T>::push_back(T elem)
 {
-    if (size_ == capacity_)
+    if (size_ >= capacity_)
     {
         allocate();
     }
@@ -132,8 +160,13 @@ size_t helpers::vector<T>::size() const
 }
 
 template <typename T>
-void helpers::vector<T>::allocate(size_t capacity = -1)
+void helpers::vector<T>::allocate(int capacity = -1)
 {
+    if(capacity_ == capacity)
+    {
+        return;
+    }
+
     if (capacity == -1)
     {
         capacity = capacity_ == 0 ? 2 : capacity_ * 2;

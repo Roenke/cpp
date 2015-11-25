@@ -12,6 +12,7 @@ namespace apa
         lint(int);
         lint(long long);           // Конструктор от целого числа
         explicit lint(double);     // Конструктор от вещественного числа
+        ~lint();
 
         lint(lint const&);         // Копирование
 
@@ -48,6 +49,8 @@ namespace apa
         void from_long_long(long long);
         lint& try_to_small();
         void assert_optimization() const;
+        lint& operator/= (int);
+        lint& small_division(int);
     };
 
     // Инкремент
