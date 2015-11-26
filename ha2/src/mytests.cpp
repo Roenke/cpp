@@ -16,8 +16,9 @@ void great_test()
     std::ifstream div_file("div.txt");
     lint my_result;
     size_t successed = 0;
-    int n;
+    int n = 0;
     sum_file >> n;
+    std::cout << n << std::endl;
     lint a, b, result;
     for (int i = 1; i <= n; ++i)
     {
@@ -117,7 +118,7 @@ void great_test()
 
 void casts_tests()
 {
-    auto ll_number = 1000000000000;
+    auto ll_number = 1000000000000LL;
     lint my_long(ll_number);
     auto new_ll = static_cast<long long>(my_long);
     assert(ll_number == new_ll);

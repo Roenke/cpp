@@ -16,7 +16,7 @@ lint::lint(std::string const& s)
     , bits_(nullptr)
 {
     auto str_length = s.length();
-    if(str_length < 10 || s[0] == '-' && str_length == 10)
+    if(str_length < 10 || (s[0] == '-' && str_length == 10))
     {
         sign_ = atoi(s.c_str());
         return;
@@ -107,21 +107,25 @@ lint::operator long long() const
 
 lint& lint::operator=(lint const& other)
 {
-    if(other.bits_ != nullptr)
+    if(this != &other)
     {
-        if(bits_ == nullptr)
+        if(other.bits_ != nullptr)
         {
-            bits_ = new vector<uint32_t>();
+            if(bits_ == nullptr)
+            {
+                bits_ = new vector<uint32_t>();
+            }
+            
+            *bits_ = *other.bits_;
+        }
+        else
+        {
+            delete bits_;
+            bits_ = nullptr;
         }
         
-        *bits_ = *other.bits_;
+        sign_ = other.sign_;
     }
-    else
-    {
-        bits_ = nullptr;
-    }
-    
-    sign_ = other.sign_;
     return *this;
 }
 
@@ -154,12 +158,12 @@ std::string lint::to_string() const
     std::ostringstream ost;
     if (sign_ == -1) ost << '-';
     auto size = bits_->size();
-    sprintf_s(buf, "%u", (*bits_)[static_cast<int>(size - 1)]);
+    sprintf(buf, "%u", (*bits_)[static_cast<int>(size - 1)]);
     ost << buf;
 
     for (auto i = static_cast<int>(size - 2); i >= 0; --i)
     {
-        sprintf_s(buf, "%09u", (*bits_)[i]);
+        sprintf(buf, "%09u", (*bits_)[i]);
         ost << buf;
     }
 
@@ -168,7 +172,8 @@ std::string lint::to_string() const
 
 lint& lint::small_division(int num)
 {
-    if (std::abs(num) >= base)
+    uint32_t divisor = std::abs(num);
+    if (divisor >= base)
     {
         return *this /= lint(num);
     }
@@ -298,8 +303,8 @@ bool apa::transdorm_div(lint& l, lint const& r)
 
 void lint::from_long_long(long long number)
 {
-    if (number >= 0 && number <= static_cast<long long>(INT32_MAX) ||
-        number < 0 && number >= static_cast<long long>(-INT32_MAX))
+    if ((number >= 0 && number <= static_cast<long long>(INT32_MAX)) ||
+        (number < 0 && number >= static_cast<long long>(-INT32_MAX)))
     {
         sign_ = static_cast<int>(number);
     }
@@ -333,8 +338,8 @@ lint& lint::try_to_small()
         value += (*bits_)[1] * base;
     }
 
-    if(sign_ == 1 && value <= INT32_MAX ||
-        sign_ == -1 && value >= -INT32_MAX)
+    if((sign_ == 1 && value <= INT32_MAX) ||
+        (sign_ == -1 && value >= -INT32_MAX))
     {
         sign_ = sign_ * static_cast<int>(value);
         delete bits_;
@@ -601,7 +606,8 @@ lint& lint::operator/=(lint const& r)
         return *this;
     }
 
-    if (r.is_small() && std::abs(r.sign_) < lint::base)
+    uint32_t divisor_abs = std::abs(r.sign_);
+    if (r.is_small() && divisor_abs < lint::base)
     {
         return small_division(r.sign_);
     }

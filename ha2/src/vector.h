@@ -1,6 +1,7 @@
 #pragma once
 #include <cassert>
 #include <algorithm>
+#include <memory.h>
 
 namespace helpers
 {
@@ -16,7 +17,7 @@ namespace helpers
 
         T& operator[](size_t);
         T const& operator[](size_t) const;
-        
+
         void resize(size_t);
 
         void push_back(T);
@@ -26,10 +27,10 @@ namespace helpers
     private:
         size_t size_;
         size_t capacity_;
-        
+
         T* content_;
 
-        void allocate(int new_capacity = -1);
+        void allocate(size_t c = -1);
     };
 
     template<typename T>
@@ -37,7 +38,7 @@ namespace helpers
 
     template<typename T>
     int cmp_bits(helpers::vector<T>const&, helpers::vector<T> const&);
-    
+
 }; /* helpers */
 
 template <typename T>
@@ -60,6 +61,7 @@ template <typename T>
 helpers::vector<T>::vector(vector<T> const& other)
     : size_(0)
     , capacity_(0)
+    , content_(nullptr)
 {
     allocate(other.size());
     size_ = other.size();
@@ -91,40 +93,31 @@ helpers::vector<T>::~vector()
 template <typename T>
 T& helpers::vector<T>::operator[](size_t index)
 {
-    if (index < 0 || index >= size_)
-    {
-        throw std::exception("Index out of range");
-    }
-
     return content_[index];
 }
 
 template <typename T>
 T const& helpers::vector<T>::operator[](size_t index) const
 {
-    if(index < 0 || index >= size_)
-    {
-        throw std::exception("Index out of range");
-    }
-
     return content_[index];
 }
 
 template <typename T>
 void helpers::vector<T>::resize(size_t new_size)
 {
-    if(new_size == size_)
+    if (new_size == size_)
     {
         return;
     }
 
-    if(new_size < size_)
+    allocate(new_size);
+
+    if (new_size < size_)
     {
         size_ = new_size;
         return;
     }
 
-    allocate(new_size);
     size_ = new_size;
 }
 
@@ -161,9 +154,9 @@ size_t helpers::vector<T>::size() const
 }
 
 template <typename T>
-void helpers::vector<T>::allocate(int capacity = -1)
+void helpers::vector<T>::allocate(size_t capacity)
 {
-    if(capacity_ == capacity)
+    if (capacity_ == capacity)
     {
         return;
     }
@@ -175,7 +168,7 @@ void helpers::vector<T>::allocate(int capacity = -1)
 
     auto memory_region = new T[capacity];
     memset(memory_region, 0, sizeof(T) * capacity);
-    if(content_ != nullptr)
+    if (content_ != nullptr)
     {
         for (size_t i = 0; i < size_; ++i)
         {
@@ -183,7 +176,7 @@ void helpers::vector<T>::allocate(int capacity = -1)
         }
         delete[] content_;
     }
-    
+
 
     content_ = memory_region;
     capacity_ = capacity;

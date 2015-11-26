@@ -1,5 +1,4 @@
 #include "mytests.h"
-#include <tests.h>
 
 int main()
 {
