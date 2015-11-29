@@ -1,4 +1,8 @@
 #pragma once
+#include <exception>
+#include <memory>
+#include <string>
+
 namespace utils
 {
     class any
@@ -12,34 +16,37 @@ namespace utils
         template<typename T>
         any& operator=(T const&);
 
+        struct inner_base
+        {
+            using ptr = std::unique_ptr<inner_base>;
+        };
+
+        template<typename T>
+        struct inner :inner_base {};
+
+
         bool empty() const;
+    private:
+        inner_base::ptr inner_;
     };
 
-    inline any::any()
-    {
-    }
-
-    inline bool any::empty() const
-    {
-        return false;
-    }
+    template <typename T>
+    any::any(T const& source)
+        : inner_(new inner<T>(std::forward(source)))
+    {}
 
     template <typename T>
-    any::any(T const&)
+    any& any::operator=(T const& other)
     {
-    }
-
-    template <typename T>
-    any& any::operator=(T const&)
-    {
-        any result;
-        return result;
+        inner_ = std::make_unique<inner<T>>(std::forward<T>(other));
+        return *this;
     }
 
     class bad_any_cast
-        : public std::exception
+        : public std::runtime_error
     {
-        
+        explicit bad_any_cast(std::string const& what)
+            : runtime_error(what) {};
     };
 
     template<typename T>
