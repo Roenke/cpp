@@ -63,7 +63,7 @@ void retrieve_value_test()
 void swap_test(any& a, any& b)
 {
     // TODO: Ќаверное правильнее свой своп сделать.
-    std::swap(a, b);
+    swap(a, b);
 }
 
 int main()
