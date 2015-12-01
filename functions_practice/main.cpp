@@ -33,6 +33,11 @@ int sqrt_func(int arg)
     return static_cast<int>(sqrt(arg));
 }
 
+int identity(int arg)
+{
+    return arg;
+}
+
 void for_each_tests()
 {
     std::vector<int> v1(10);
@@ -48,7 +53,25 @@ void for_each_tests()
     std::cout << "for_each tests passed" << std::endl;
 }
 
+void sum_vector_tests()
+{
+    std::vector<int> v1(10);
+    v1.assign(10, 3);
+
+    auto result = sum_vector(v1, identity);
+    assert(v1[0] == 3);
+    assert(result == 10 * 3);
+
+    result = sum_vector(v1, sqr_func);
+    assert(result == 9 * 10);
+    assert(v1[0] == 3);
+
+    std::cout << "sum_vector tests passed" << std::endl;
+}
+
 int main()
 {
     for_each_tests();
+
+    sum_vector_tests();
 }
