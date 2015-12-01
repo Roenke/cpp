@@ -2,6 +2,8 @@
 #include <cassert>
 #include <iostream>
 #include "io.h"
+#include "event.h"
+
 void for_each(std::vector<int>& vector, int (*func)(int))
 {
     auto size = vector.size();
@@ -99,6 +101,42 @@ void io_tests()
     std::cout << "reads/writes tests passed" << std::endl;
 }
 
+bool echo_called = false;
+bool hello_called = false;
+bool lambda_called = false;
+
+void echo(std::string arg)
+{
+    std::cout << arg << std::endl;
+    echo_called = true;
+}
+
+void hello(std::string arg)
+{
+    std::cout << "Hello " << arg << std::endl;
+    hello_called = true;
+}
+
+void event_tests()
+{
+    event ev;
+
+    ev.subscribe(echo);
+    ev.subscribe(hello);
+    ev.subscribe([](std::string arg){
+        std::cout << "lambda " << arg << std::endl;
+        lambda_called = true;
+    });
+
+    ev.fire("X");
+
+    assert(lambda_called);
+    assert(hello_called);
+    assert(echo_called);
+
+    std::cout << "event class tests passed" << std::endl;
+}
+
 int main()
 {
     for_each_tests();
@@ -106,4 +144,6 @@ int main()
     sum_vector_tests();
 
     io_tests();
+
+    event_tests();
 }
