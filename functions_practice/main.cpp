@@ -1,7 +1,7 @@
 #include <vector>
 #include <cassert>
 #include <iostream>
-
+#include "io.h"
 void for_each(std::vector<int>& vector, int (*func)(int))
 {
     auto size = vector.size();
@@ -69,9 +69,41 @@ void sum_vector_tests()
     std::cout << "sum_vector tests passed" << std::endl;
 }
 
+void io_tests()
+{
+    FILE *f;
+    fopen_s(&f, "in.txt", "r");
+    uint64_t llvalue;
+    double dvalue;
+    int ivalue;
+    char svalue[10];
+
+    read(f, llvalue);
+    read(f, dvalue);
+    read(f, ivalue);
+    //read(f, svalue);
+
+    assert(llvalue == 10);
+    assert(dvalue == 1000.);
+    assert(ivalue == 123);
+    //assert(svalue[0] == 'a');
+    fclose(f);
+
+    fopen_s(&f, "out.txt", "w");
+    write(f, llvalue);
+    write(f, dvalue);
+    write(f, ivalue);
+    //write(f, svalue);
+    fclose(f);
+
+    std::cout << "reads/writes tests passed" << std::endl;
+}
+
 int main()
 {
     for_each_tests();
 
     sum_vector_tests();
+
+    io_tests();
 }
