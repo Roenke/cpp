@@ -7,6 +7,8 @@ struct shared_buffer
     shared_buffer& operator=(shared_buffer src);
     ~shared_buffer();
 
+    void new_data(const char*);
+
     char* get_data();
     const char* get_data() const;
 

@@ -41,9 +41,31 @@ void lazy_string_tests()
     print(std::cout, concat(begin, end));
 }
 
+
+void lazy_copy_on_write_tests()
+{
+    lazy_string ls1("my string");
+
+    auto ls2 = ls1;
+    auto ls3(ls2);
+
+    ls1.set_at(1, 'o');
+    ls2.set_at(1, 'p');
+    assert(ls3.get_at(1) == 'y');
+    assert(ls1.get_at(1) == 'o');
+    assert(ls2.get_at(1) == 'p');
+
+    lazy_string begin("Lazy copy on write string ");
+    lazy_string end("passed tests.");
+
+    print(std::cout, concat(begin, end));
+}
+
 void main()
 {
     shared_buffer_tests();
 
     lazy_string_tests();
+
+    lazy_copy_on_write_tests();
 }
