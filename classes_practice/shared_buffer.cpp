@@ -54,6 +54,11 @@ const char* shared_buffer::get_data() const
 
 size_t shared_buffer::get_size() const
 {
+    if(data_size_ == nullptr)
+    {
+        return 0;
+    }
+
     return *data_size_;
 }
 
