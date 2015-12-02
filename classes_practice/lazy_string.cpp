@@ -31,3 +31,20 @@ char lazy_string::get_at(size_t ix) const
     }
     return buffer_.get_data()[ix];
 }
+
+void print(std::ostream& os, lazy_string const& str)
+{
+    os << str.buffer_.get_data() << std::endl;
+}
+
+lazy_string concat(lazy_string const& str1, lazy_string const& str2)
+{
+    auto new_size = str1.get_size() + str2.get_size();
+    auto new_buffer = new char[new_size + 1];
+    strcpy(&new_buffer[0], str1.buffer_.get_data());
+    strcpy(&new_buffer[str1.get_size() - 1], str2.buffer_.get_data());
+    new_buffer[new_size] = '\0';
+    lazy_string new_str(new_buffer);
+    return new_str;
+}
+

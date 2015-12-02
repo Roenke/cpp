@@ -1,5 +1,6 @@
 #pragma once
 #include "shared_buffer.h"
+#include <ostream>
 
 class lazy_string
 {
@@ -13,5 +14,8 @@ public:
     char get_at(size_t ix) const;
 
 private:
+    friend void print(std::ostream& os, lazy_string const& str);
+    friend lazy_string concat(lazy_string const& str1, lazy_string const& str2);
+
     shared_buffer buffer_;
 };

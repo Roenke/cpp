@@ -35,7 +35,10 @@ void lazy_string_tests()
     assert(ls2.get_at(2) == 'l');
     assert(ls3.empty() == false);
 
-    std::cout << "Lazy string passed tests" << std::endl;
+    lazy_string begin("Lazy string ");
+    lazy_string end("passed tests.");
+
+    print(std::cout, concat(begin, end));
 }
 
 void main()
