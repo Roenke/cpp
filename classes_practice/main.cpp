@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cstring>
 #include <iostream>
+#include "lazy_string.h"
 
 void shared_buffer_tests()
 {
@@ -24,7 +25,22 @@ void shared_buffer_tests()
     std::cout << "Shared buffer passed tests" << std::endl;
 }
 
+void lazy_string_tests()
+{
+    lazy_string ls("hello");
+    auto ls2(ls);
+    auto ls3(ls2);
+
+    assert(ls2.empty() == false);
+    assert(ls2.get_at(2) == 'l');
+    assert(ls3.empty() == false);
+
+    std::cout << "Lazy string passed tests" << std::endl;
+}
+
 void main()
 {
     shared_buffer_tests();
+
+    lazy_string_tests();
 }
