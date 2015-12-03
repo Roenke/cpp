@@ -72,6 +72,12 @@ bool lazy::find(lazy_string const& in, const char* what, size_t& result, size_t 
     return false;
 }
 
+std::ostream& lazy::operator<<(std::ostream& os, lazy_string const& ls)
+{
+    print(os, ls);
+    return os;
+}
+
 void lazy::print(std::ostream& os, lazy_string const& str)
 {
     os << str.buffer_->get_data() << std::endl;

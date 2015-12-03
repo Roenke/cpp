@@ -25,6 +25,8 @@ namespace lazy
     };
 
     bool find(lazy_string const&, const char*, size_t&, size_t ix=0);
+
+    std::ostream& operator<<(std::ostream& os, lazy_string const& ls);
 }; /* lazy */
 
 

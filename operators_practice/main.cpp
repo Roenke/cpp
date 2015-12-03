@@ -83,6 +83,12 @@ void lazy_find_tests()
     std::cout << "Find in lazy strings passed tests" << std::endl;
 }
 
+void lazy_operators_tests()
+{
+    lazy_string ls("My test text");
+    std::cout << ls;
+}
+
 void main()
 {
     shared_buffer_tests();
@@ -92,4 +98,6 @@ void main()
     lazy_copy_on_write_tests();
 
     lazy_find_tests();
+
+    lazy_operators_tests();
 }
