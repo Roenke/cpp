@@ -38,6 +38,11 @@ void lazy_string::set_at(size_t ix, char value)
     }
 }
 
+char lazy_string::operator[](size_t ix) const
+{
+    return get_at(ix);
+}
+
 bool lazy_string::empty() const
 {
     return buffer_->get_size() == 0;

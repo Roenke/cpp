@@ -97,6 +97,9 @@ void lazy_operators_tests()
     assert(!lsa.empty());
     assert(lsa.get_at(0) == 'H');
 
+    assert(lsa[1] == 'e');
+    assert(lsb[3] == 'l');
+
     assert(lazy_string("a") < lazy_string("bbb"));
     assert(lazy_string("abba") < lazy_string("abbb"));
     assert(!(lazy_string("qwertyy") < lazy_string("qwerty")));
