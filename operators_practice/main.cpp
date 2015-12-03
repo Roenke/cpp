@@ -96,9 +96,10 @@ void lazy_operators_tests()
 
     assert(!lsa.empty());
     assert(lsa.get_at(0) == 'H');
-
+    
+    lsa[3] = 'y';
     assert(lsa[1] == 'e');
-    assert(lsb[3] == 'l');
+    assert(lsa[3] != 'l');
 
     assert(lazy_string("a") < lazy_string("bbb"));
     assert(lazy_string("abba") < lazy_string("abbb"));

@@ -38,9 +38,10 @@ void lazy_string::set_at(size_t ix, char value)
     }
 }
 
-char lazy_string::operator[](size_t ix) const
+lazy_string::proxy& lazy_string::operator[](size_t const ix)
 {
-    return get_at(ix);
+    auto prox = new proxy(*this, ix);
+    return *prox;
 }
 
 bool lazy_string::empty() const
