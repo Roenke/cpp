@@ -2,6 +2,7 @@
 #include "lazy_string.h"
 #include <cstring>
 #include <exception>
+#include <algorithm>
 
 using namespace lazy;
 
@@ -17,7 +18,8 @@ lazy_string::lazy_string(const lazy_string& src)
 
 lazy_string lazy_string::operator=(lazy_string src)
 {
-    std::swap(*this, src);
+    delete buffer_;
+    buffer_ = src.buffer_;
     return *this;
 }
 
@@ -65,6 +67,37 @@ bool lazy::find(lazy_string const& in, const char* what, size_t& result, size_t 
         if(j == what_size)
         {
             result = i;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+lazy_string& lazy::operator+=(lazy_string& lhs, lazy_string const& rhs)
+{
+    lhs = concat(lhs, rhs);
+    return lhs;
+}
+
+lazy_string lazy::operator+(lazy_string const& lhs, lazy_string const& rhs)
+{
+    return concat(lhs, rhs);
+}
+
+bool lazy::operator<(lazy_string const& lhs, lazy_string const& rhs)
+{
+    if(lhs.get_size() > rhs.get_size())
+    {
+        return false;
+    }
+
+    auto min_size =lhs.get_size();
+    size_t i;
+    for (i = 0; i < min_size && lhs.get_at(i) <= rhs.get_at(i); ++i)
+    {
+        if(lhs.get_at(i) < rhs.get_at(i))
+        {
             return true;
         }
     }

@@ -87,6 +87,21 @@ void lazy_operators_tests()
 {
     lazy_string ls("My test text");
     std::cout << ls;
+
+    lazy_string lsa("Hello ");
+    lazy_string lsb("world");
+    lsa += lsb;
+    
+    lsa += lsb + lsa;
+
+    assert(!lsa.empty());
+    assert(lsa.get_at(0) == 'H');
+
+    assert(lazy_string("a") < lazy_string("bbb"));
+    assert(lazy_string("abba") < lazy_string("abbb"));
+    assert(!(lazy_string("qwertyy") < lazy_string("qwerty")));
+
+    std::cout << lsa;
 }
 
 void main()
