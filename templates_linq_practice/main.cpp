@@ -19,7 +19,7 @@ void select_tests()
 
     auto result = linq::from(v1)
         .where([](int x) {return x < 5; })
-        .select<double>([](int x) { return static_cast<double>(x) * x; } )
+        .select([](int x) { return static_cast<double>(x) * x; } )
         .to_vector();
 
     assert(result.size() == 4);

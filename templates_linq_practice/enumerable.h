@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <functional>
+#include <type_traits>
 
 namespace linq
 {
@@ -11,8 +12,8 @@ namespace linq
         enumerable(std::vector<T> const&);
         enumerable<T> where(std::function<bool(T)>);
 
-        template<typename U>
-        enumerable<U> select(std::function<U(T)> f);
+        template<typename Fn, typename U = typename std::result_of<Fn(T)>::type>
+        enumerable<U> select(Fn && f);
 
         size_t count(std::function<bool(T)>);
         size_t count();
@@ -53,13 +54,13 @@ linq::enumerable<T> linq::enumerable<T>::where(std::function<bool(T)> predicate)
 }
 
 template <typename T>
-template <typename U>
-linq::enumerable<U> linq::enumerable<T>::select(std::function<U(T)> modifier)
+template <typename Fn, typename U>
+linq::enumerable<U> linq::enumerable<T>::select(Fn&& f)
 {
     std::vector<U> result;
-    for(auto const& elem: internal_)
+    for (auto const& elem : internal_)
     {
-        result.push_back(modifier(elem));
+        result.push_back(f(elem));
     }
 
     return enumerable<U>(result);
