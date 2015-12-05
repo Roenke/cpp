@@ -2,6 +2,7 @@
 #include "scoped_ptr.h"
 #include <cassert>
 #include "unique_ptr.h"
+#include "shared_ptr.h"
 
 // #define COMPILE_MUST_FAILED
 struct foo
@@ -119,7 +120,19 @@ void test_unique()
 
 void test_shared()
 {
+    using namespace my_ptrs;
+    shared_ptr<foo> foo_ptr(new foo(888, 999));
+    auto foo_ptr2 = foo_ptr;
+    assert(foo_ptr.get() == foo_ptr2.get());
 
+    std::cout << foo_ptr->field1 << " " << (*foo_ptr2).field2 << std::endl;
+    {
+        auto foo_ptr3 = foo_ptr;
+    }
+
+    assert(foo_ptr);
+
+    std::cout << "Shared ptr passed tests." << std::endl;
 }
 
 void main() 
