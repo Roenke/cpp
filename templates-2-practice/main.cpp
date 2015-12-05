@@ -57,6 +57,8 @@ void test_scoped()
     }
 
     std::cout << "foo_ptr must be deleted" << std::endl;
+
+    std::cout << "Scoped ptr passed tests." << std::endl;
 #ifdef COMPILE_MUST_FAILED
     foo_ptr = std::move(foo_ptr);
     auto foo_ptr2(foo_ptr);
@@ -65,15 +67,54 @@ void test_scoped()
 #endif
 }
 
+my_ptrs::unique_ptr<foo> create_foo()
+{
+    auto result(new foo(666, 777));
+    return result;
+}
+
+int get_field1(my_ptrs::unique_ptr<foo> foo)
+{
+    return foo->field1;
+}
+
 void test_unique()
 {
     using namespace my_ptrs;
-    unique_ptr<foo> foo_ptr(new foo(666, 777));
+    my_ptrs::unique_ptr<foo> foo_ptr(new foo(666, 777));
     auto foo_ptr_shared = std::move(foo_ptr);
+    
+    assert((*foo_ptr_shared).field1 == 666);
+
     auto foo_ptr_shared_again = std::move(foo_ptr_shared);
 
+    assert(foo_ptr_shared_again.get()->field2 == 777);
 
+    assert(foo_ptr_shared_again);
 
+    auto throwed = false;
+
+    try
+    {
+        std::cerr << foo_ptr->field1 << std::endl;
+    }
+    catch(npe_exception const& ex)
+    {
+        throwed = true;
+        std::cerr << ex.what() << std::endl;
+    }
+
+    assert(throwed == true);
+#ifdef COMPILE_MUST_FAILED
+    auto foo_ptrs_fails(foo_ptr_shared_again);
+#endif
+
+    auto func_ptr = create_foo();
+
+    assert(func_ptr->field2 == 777);
+
+    assert(get_field1(create_foo()) == 666);
+    std::cout << "Unique ptr passed tests." << std::endl;
 }
 
 void test_shared()
