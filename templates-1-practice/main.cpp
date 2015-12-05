@@ -2,6 +2,7 @@
 #include "operators.h"
 #include <cassert>
 #include "queue.h"
+#include "priority_queue.h"
 
 int generator()
 {
@@ -156,6 +157,43 @@ void queue_tests()
     std::cout << "templated queue tests passed" << std::endl;
 }
 
+void priority_queue_tests()
+{
+    priority_queue<double> double_queue;
+    priority_queue<int> int_queue;
+
+    assert(double_queue.size() == 0);
+    assert(int_queue.size() == 0);
+
+    double_queue.push(5., 1);
+    double_queue.push(10., 2);
+    double_queue.push(20.0, 3);
+
+    assert(double_queue.front() == 20.0);
+    assert(double_queue.size() == 3);
+    double_queue.push(15.0, 2);
+    assert(double_queue.size() == 4);
+    assert(double_queue.front() == 20.);
+    double_queue.pop();
+    assert(double_queue.size() == 3);
+    assert(double_queue.front() == 15. || double_queue.front() == 10.);
+   
+    auto copy_double = double_queue;
+
+    assert(copy_double.size() == double_queue.size());
+    copy_double.pop();
+    assert(copy_double.size() != double_queue.size());
+    assert(double_queue.front() == 15. || double_queue.front() == 10.);
+
+    auto copy_copy_double(copy_double);
+    assert(copy_copy_double.size() == copy_double.size());
+    copy_copy_double.pop();
+    assert(copy_copy_double.front() == 5.);
+    assert(copy_copy_double.size() != copy_double.size());
+
+    std::cout << "templated priority queue tests passed" << std::endl;
+}
+
 void main()
 {
     fill_tests();
@@ -166,4 +204,6 @@ void main()
     accumulate_tests();
 
     queue_tests();
+
+    priority_queue_tests();
 }
