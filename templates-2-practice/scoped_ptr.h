@@ -84,7 +84,7 @@ void my_ptrs::scoped_ptr<T>::free()
 {
     if(ptr_ != nullptr)
     {
-        std::cerr << "Delete object foo at " << ptr_ << std::endl;
+        std::cerr << "Shared poiner. Delete object foo at " << ptr_ << std::endl;
     }
 
     delete ptr_;
