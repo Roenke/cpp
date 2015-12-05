@@ -1,4 +1,6 @@
 
+#include "npe_exception.h"
+
 namespace my_ptrs
 {
     template <typename T>
@@ -12,13 +14,14 @@ namespace my_ptrs
 
         operator bool() const;
 
-        void reset(T*);
+        void reset(T* = nullptr);
 
         T* operator->();
         T& operator*();
 
         ~scoped_ptr();
     private:
+        void free();
         T* ptr_;
     };
 }; /* my_ptrs */
@@ -42,28 +45,47 @@ my_ptrs::scoped_ptr<T>::operator bool() const
 }
 
 template <typename T>
-void my_ptrs::scoped_ptr<T>::reset(T* other = nullptr)
+void my_ptrs::scoped_ptr<T>::reset(T* other)
 {
-    delete ptr_;
-    ptr_ = nullptr;
+    free();
+    ptr_ = other;
 }
 
 template <typename T>
 T* my_ptrs::scoped_ptr<T>::operator->()
 {
+    if (ptr_ == nullptr)
+    {
+        throw npe_exception();
+    }
+
     return ptr_;
 }
 
 template <typename T>
 T& my_ptrs::scoped_ptr<T>::operator*()
 {
+    if(ptr_ == nullptr)
+    {
+        throw npe_exception();
+    }
+
     return *ptr_;
 }
 
 template <typename T>
 my_ptrs::scoped_ptr<T>::~scoped_ptr()
 {
-    std::cout << "Delete object foo at " << ptr_ << std::endl;
+    free();
+}
+
+template <typename T>
+void my_ptrs::scoped_ptr<T>::free()
+{
+    if(ptr_ != nullptr)
+    {
+        std::cerr << "Delete object foo at " << ptr_ << std::endl;
+    }
 
     delete ptr_;
 }
