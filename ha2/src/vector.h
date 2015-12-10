@@ -1,7 +1,6 @@
 #pragma once
 #include <cassert>
 #include <algorithm>
-#include <memory.h>
 
 namespace helpers
 {
@@ -54,7 +53,7 @@ helpers::vector<T>::vector(int size)
     , capacity_(size)
     , content_(new T[size])
 {
-    memset(content_, 0, sizeof(T) * size);
+    std::fill(content_, content_ + size_, 0);
 }
 
 template <typename T>
@@ -167,7 +166,7 @@ void helpers::vector<T>::allocate(size_t capacity)
     }
 
     auto memory_region = new T[capacity];
-    memset(memory_region, 0, sizeof(T) * capacity);
+    std::fill(memory_region, memory_region + capacity, 0);
     if (content_ != nullptr)
     {
         for (size_t i = 0; i < size_; ++i)
