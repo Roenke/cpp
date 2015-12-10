@@ -2,7 +2,7 @@
 
 import random
 
-test_count = 1000
+test_count = 10000
 max_value = 3845734875678342583745982347582945732849573248957329857348956378246873465
 
 
@@ -17,15 +17,21 @@ def generate_mul():
 
 def generate_div():
     with open('div.txt', 'w') as file:
-        file.write('%d\n' % (2 * test_count))
+        file.write('%d\n' % (8 * test_count))
         for i in range(test_count):
             l = int(random.uniform(0, max_value))
             r = int(random.uniform(100000, max_value))
             file.write("%d %d %d\n" % (l, r, l // r))
+            file.write("%d %d %d\n" % (-l, r, -l // r))
+            file.write("%d %d %d\n" % (l, -r, l // r))
+            file.write("%d %d %d\n" % (-l, -r, l // r))
         for i in range(test_count):
             l = int(random.uniform(0, max_value))
             r = int(random.uniform(1, 10000))
             file.write("%d %d %d\n" % (l, r, l // r))
+            file.write("%d %d %d\n" % (l, -r, -l // r))
+            file.write("%d %d %d\n" % (-l, r, -l // r))
+            file.write("%d %d %d\n" % (-l, -r, l // r))
 
 
 def generate_sum():
