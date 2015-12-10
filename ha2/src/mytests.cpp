@@ -10,10 +10,10 @@ using helpers::vector;
 
 void great_test()
 {
-    std::ifstream sum_file("sum.txt");
-    std::ifstream sub_file("sub.txt");
-    std::ifstream mul_file("mul.txt");
-    std::ifstream div_file("div.txt");
+    std::ifstream sum_file("sum.test");
+    std::ifstream sub_file("sub.test");
+    std::ifstream mul_file("mul.test");
+    std::ifstream div_file("div.test");
     lint my_result;
     size_t successed = 0;
     int n = 0;
