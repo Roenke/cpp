@@ -461,6 +461,29 @@ void to_string_tests()
         "8934769679583758672945879243653248740723658749856747564248765783249834263428484275248754");
 }
 
+void long_short_div_tests()
+{
+    
+}
+
+void long_long_div_tests()
+{
+    lint num1("-3337685018533711592795871667265218987553187864987592273118827203149168640");
+    lint num2("-337922113784322481219260974202273723021564191665655367473357206667132928");
+    assert(-num1 / -num2 == 9);
+    auto res = num1 / num2;
+    assert(res == 9);
+}
+
+void positive_negative_div_tests()
+{
+    lint num1("-2335710347765676070248101396666744997854320558980944725163584962019983360");
+    lint num2("-3033133504283735774253788073215218217783737653671023249380399954094194688");
+    assert(-num1 / -num2 == 0);
+    auto res = num1 / num2;
+    assert(res == 0);
+}
+
 void start_my_tests()
 {
     my_vector_tests();
@@ -470,6 +493,9 @@ void start_my_tests()
     plus_tests();
     minus_tests();
     div_tests();
+    long_short_div_tests();
+    long_long_div_tests();
+    positive_negative_div_tests();
     cmp_tests();
     mul_tests();
     

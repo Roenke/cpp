@@ -158,12 +158,12 @@ std::string lint::to_string() const
     std::ostringstream ost;
     if (sign_ == -1) ost << '-';
     auto size = bits_->size();
-    sprintf(buf, "%u", (*bits_)[static_cast<int>(size - 1)]);
+    sprintf_s(buf, "%u", (*bits_)[static_cast<int>(size - 1)]);
     ost << buf;
 
     for (auto i = static_cast<int>(size - 2); i >= 0; --i)
     {
-        sprintf(buf, "%09u", (*bits_)[i]);
+        sprintf_s(buf, "%09u", (*bits_)[i]);
         ost << buf;
     }
 
@@ -286,7 +286,7 @@ bool apa::transform_minus(lint& l, lint const& r)
 
 bool apa::transdorm_div(lint& l, lint const& r)
 {
-    if (l < r)
+    if (abs(l) < abs(r))
     {
         l = 0;
         return true;
@@ -623,10 +623,11 @@ lint& lint::operator/=(lint const& r)
     }
 
 
-    lint left(1);
-    auto right(r);
+    lint left(0);
+    auto abs_r = abs(r);
+    auto abs_l = abs(*this);
+    auto right(abs_r);
     right.unpack();
-    auto r_sign = right.sign_;
     lint center;
     lint lc;
     lint lcp;
@@ -634,26 +635,25 @@ lint& lint::operator/=(lint const& r)
     while (left <= right)
     {
         center = (left + right).small_division(2);
-        lc = r * center;
-        lcp = r * (center + 1);
-        bool lesser = lc < *this;
-        if (lc == *this || (lesser && lcp > *this))
+        lc = abs_r * center;
+        lcp = abs_r * (center + 1);
+        bool lesser = lc < abs_l;
+        if (lc == abs_l || (lesser && lcp > abs_l))
         {
-            *this = center;
             break;
         }
-        //        std::cout << center << std::endl;
+        //std::cout << center << std::endl;
         if (lesser)
         {
             left = center + 1;
         }
         else
         {
-            right = center - 1;
+            right = center;
         }
     }
 
-    sign_ *= r_sign;
+    *this = sign_ * r.sign_ * center;
     return try_to_small();
 }
 
