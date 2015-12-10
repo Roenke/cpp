@@ -21,17 +21,19 @@ def generate_div():
         for i in range(test_count):
             l = int(random.uniform(0, max_value))
             r = int(random.uniform(100000, max_value))
+            addition = 0 if l % r == 0 else 1
             file.write("%d %d %d\n" % (l, r, l // r))
-            file.write("%d %d %d\n" % (-l, r, -l // r))
-            file.write("%d %d %d\n" % (l, -r, l // r))
-            file.write("%d %d %d\n" % (-l, -r, l // r))
+            file.write("%d %d %d\n" % (-l, r, -l // r + addition))
+            file.write("%d %d %d\n" % (l, -r, l // -r + addition))
+            file.write("%d %d %d\n" % (-l, -r, -l // -r))
         for i in range(test_count):
             l = int(random.uniform(0, max_value))
             r = int(random.uniform(1, 10000))
+            addition = 0 if l % r == 0 else 1
             file.write("%d %d %d\n" % (l, r, l // r))
-            file.write("%d %d %d\n" % (l, -r, -l // r))
-            file.write("%d %d %d\n" % (-l, r, -l // r))
-            file.write("%d %d %d\n" % (-l, -r, l // r))
+            file.write("%d %d %d\n" % (-l, r, -l // r + addition))
+            file.write("%d %d %d\n" % (l, -r, l // -r + addition))
+            file.write("%d %d %d\n" % (-l, -r, -l // -r))
 
 
 def generate_sum():
