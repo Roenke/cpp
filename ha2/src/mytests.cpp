@@ -144,6 +144,9 @@ void casts_tests()
     assert(max_int == my_big);
     assert(my_small_overflow == min_int_overflow);
 
+    assert(static_cast<int>(my_big) == INT32_MAX);
+    assert(static_cast<int>(my_small_overflow) == INT32_MIN);
+
     std::cout << "Long long casts passed" << std::endl;
 }
 

@@ -87,6 +87,11 @@ lint::operator int() const
         return sign_;
     }
 
+    if(sign_ == -1 && bits_->size() == 2 && (*bits_)[0] == 147483648 && (*bits_)[1] == 2)
+    {
+        return INT32_MIN;
+    }
+
     return (*bits_)[0];
 }
 
