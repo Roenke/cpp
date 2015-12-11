@@ -213,7 +213,7 @@ void lint::unpack()
         return;
     }
     
-    auto value = sign_;
+    auto value = std::abs(sign_);
     sign_ = sign_ >= 0 ? 1 : -1;
 
     bits_ = new vector<uint32_t>(2);
@@ -643,7 +643,7 @@ lint& lint::operator/=(lint const& r)
         lc = abs_r * center;
         lcp = abs_r * (center + 1);
         bool lesser = lc < abs_l;
-        if (lc == abs_l || (lesser && lcp > abs_l))
+        if (!lesser && lc == abs_l || lesser && lcp > abs_l)
         {
             break;
         }
@@ -658,7 +658,7 @@ lint& lint::operator/=(lint const& r)
         }
     }
 
-    *this = sign_ * r.sign_ * center;
+    *this = (sign_ * r.sign_) * center;
     return try_to_small();
 }
 
