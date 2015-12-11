@@ -631,7 +631,7 @@ lint& lint::operator/=(lint const& r)
     lint left(0);
     auto abs_r = abs(r);
     auto abs_l = abs(*this);
-    auto right(abs_r);
+    auto right(abs_l);
     right.unpack();
     lint center;
     lint lc;
@@ -654,7 +654,7 @@ lint& lint::operator/=(lint const& r)
         }
         else
         {
-            right = center;
+            right = center - 1;
         }
     }
 
