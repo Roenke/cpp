@@ -21,6 +21,7 @@ namespace helpers
         bits() = delete;
         explicit bits(size_t);
         bits(bits const & other);
+        bits(bits &&);
         bits& operator=(bits const & other);
         ~bits();
 

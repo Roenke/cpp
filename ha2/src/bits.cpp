@@ -17,6 +17,12 @@ helpers::bits::bits(bits const& other)
     , content_(new bits_buffer(*other.content_))
 {}
 
+helpers::bits::bits(bits && other)
+    : size_(other.size_)
+    , content_(new bits_buffer(*other.content_))
+{
+}
+
 helpers::bits& helpers::bits::operator=(bits const& other)
 {
     *content_ = *other.content_;

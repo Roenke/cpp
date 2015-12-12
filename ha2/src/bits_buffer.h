@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cstddef>
+
 namespace helpers
 {
     struct bits_buffer
@@ -8,6 +9,7 @@ namespace helpers
         bits_buffer() = delete;
         explicit bits_buffer(size_t);
         bits_buffer(bits_buffer const&);
+        bits_buffer(bits_buffer &&);
         bits_buffer& operator=(bits_buffer const & other);
         ~bits_buffer();
 

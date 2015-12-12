@@ -1,6 +1,8 @@
 #include "bits_buffer.h"
 #include <algorithm>
 
+
+
 helpers::bits_buffer::bits_buffer(size_t size)
     : size_(std::max(size, static_cast<size_t>(1)))
     , links_count_(new size_t(1))
@@ -15,6 +17,15 @@ helpers::bits_buffer::bits_buffer(bits_buffer const& other)
     , data_(other.data_)
 {
     ++*links_count_;
+}
+
+helpers::bits_buffer::bits_buffer(bits_buffer&& other)
+    : size_(other.size_)
+    , links_count_(nullptr)
+    , data_(nullptr)
+{
+    std::swap(links_count_, other.links_count_);
+    std::swap(data_, other.data_);
 }
 
 helpers::bits_buffer& helpers::bits_buffer::operator=(bits_buffer const& other)

@@ -12,6 +12,16 @@ lint::lint()
 {
 }
 
+lint::lint(lint && other)
+    : sign_(other.sign_)
+    , bits_(nullptr)
+{
+    if(other.bits_ != nullptr)
+    {
+        bits_ = new bits(*other.bits_);
+    }
+}
+
 lint::lint(std::string const& s)
     : sign_(0)
     , bits_(nullptr)
@@ -159,12 +169,12 @@ std::string lint::to_string() const
     std::ostringstream ost;
     if (sign_ == -1) ost << '-';
     auto size = bits_->size();
-    sprintf(buf, "%u", static_cast<uint32_t>((*bits_)[static_cast<int>(size - 1)]));
+    sprintf_s(buf, "%u", static_cast<uint32_t>((*bits_)[static_cast<int>(size - 1)]));
     ost << buf;
 
     for (auto i = static_cast<int>(size - 2); i >= 0; --i)
     {
-        sprintf(buf, "%09u", static_cast<uint32_t>((*bits_)[i]));
+        sprintf_s(buf, "%09u", static_cast<uint32_t>((*bits_)[i]));
         ost << buf;
     }
 
@@ -494,7 +504,7 @@ lint& lint::operator+=(lint const&r)
         r_value = (i < r_size ? (*right.bits_)[i] : 0);
         (*bits_)[i] = (*bits_)[i] + k + r_value;
         k = (*bits_)[i] >= base;
-        if (k)  (*bits_)[i] = (*bits_)[i] - base;
+        if (k)  (*bits_)[i] = (*bits_)[i] - static_cast<uint32_t>(base);
     }
 
     return try_to_small();

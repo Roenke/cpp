@@ -15,6 +15,7 @@ namespace apa
         ~lint();
 
         lint(lint const&);         // Копирование
+        lint(lint &&);
 
         explicit operator bool() const;
         explicit operator int() const;

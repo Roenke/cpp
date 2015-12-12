@@ -118,8 +118,7 @@ void casts_tests()
 {
     auto ll_number = 1000000000000LL;
     lint my_long(ll_number);
-    auto new_ll = static_cast<long long>(my_long);
-    assert(ll_number == new_ll);
+    assert(ll_number == static_cast<long long>(my_long));
 
     long long short_long = 100000;
     lint my(short_long);
