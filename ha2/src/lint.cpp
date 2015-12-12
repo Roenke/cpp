@@ -27,7 +27,7 @@ lint::lint(std::string const& s)
     , bits_(nullptr)
 {
     auto str_length = s.length();
-    if (str_length < 10 || (s[0] == '-' && str_length == 10))
+    if (str_length <= max_positive_small_length || (s[0] == '-' && str_length == max_negative_small_length))
     {
         sign_ = atoi(s.c_str());
         return;
@@ -232,6 +232,7 @@ bool lint::is_zero() const
     return sign_ == 0 && bits_ == nullptr;
 }
 
+// magic eq transform for plus operation
 bool apa::transform_plus(lint& l, lint const& r)
 {
     if (l < 0 && r < 0)
@@ -255,6 +256,7 @@ bool apa::transform_plus(lint& l, lint const& r)
     return false;
 }
 
+// magic eq transform for substruct operation
 bool apa::transform_minus(lint& l, lint const& r)
 {
     if (l == 0)
@@ -295,6 +297,7 @@ bool apa::transform_minus(lint& l, lint const& r)
     return false;
 }
 
+// magic eq transform for division operation
 bool apa::transdorm_div(lint& l, lint const& r)
 {
     if (abs(l) < abs(r))
@@ -358,23 +361,6 @@ lint& lint::try_to_small()
     }
 
     return *this;
-}
-
-void lint::assert_optimization() const
-{
-    if (bits_ == nullptr)
-    {
-        return;
-    }
-    for (int i = bits_->size() - 1; i > 0; --i)
-    {
-        if ((*bits_)[i] != 0)
-        {
-            return;
-        }
-    }
-
-    assert(false);
 }
 
 lint& apa::operator++(lint& val)

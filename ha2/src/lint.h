@@ -7,14 +7,14 @@ namespace apa
 {
     struct lint
     {
-        lint();                    // Конструктор по умолчанию
-        lint(std::string const&);  // Конструктор от строки
+        lint();
+        lint(std::string const&);
         lint(int);
-        lint(long long);           // Конструктор от целого числа
-        explicit lint(double);     // Конструктор от вещественного числа
+        lint(long long);
+        explicit lint(double);
         ~lint();
 
-        lint(lint const&);         // Копирование
+        lint(lint const&);
         lint(lint &&);
 
         explicit operator bool() const;
@@ -40,7 +40,8 @@ namespace apa
 
     private:
         static uint64_t constexpr base = 1000 * 1000 * 1000;
-        
+        static uint32_t constexpr max_positive_small_length = 9;
+        static uint32_t constexpr max_negative_small_length = 10;
         int sign_;
         helpers::bits* bits_;
 
@@ -48,7 +49,6 @@ namespace apa
         bool is_zero() const;
         void from_long_long(long long);
         lint& try_to_small();
-        void assert_optimization() const;
         lint& small_division(int);
     };
 

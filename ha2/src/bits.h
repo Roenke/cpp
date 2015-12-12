@@ -33,7 +33,9 @@ namespace helpers
         void push_back(uint32_t);
         uint32_t& pop_back();
         uint32_t const& back() const;
+
         size_t size() const;
+
     private:
         uint32_t get_at(uint32_t) const;
         void set_at(size_t, uint32_t) const;

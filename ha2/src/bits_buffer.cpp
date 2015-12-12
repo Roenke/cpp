@@ -98,7 +98,7 @@ void helpers::bits_buffer::dup()
     data_ = new_data;
 }
 
-void helpers::bits_buffer::unlink()
+void helpers::bits_buffer::unlink() const
 {
     --*links_count_;
 }

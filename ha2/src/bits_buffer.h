@@ -25,7 +25,7 @@ namespace helpers
         size_t* links_count_;
         uint32_t* data_;
 
-        void unlink();
+        void unlink() const;
         void fill() const;
     };
 }; /*helpers */
