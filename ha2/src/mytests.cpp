@@ -1,19 +1,17 @@
 #include "lint.h"
 #include "mytests.h"
-#include "vector.h"
 #include <cassert>
 #include <iostream>
 #include <fstream>
 
 using namespace apa;
-using helpers::vector;
 
 void great_test()
 {
-    std::ifstream sum_file("sum.txt");
-    std::ifstream sub_file("sub.txt");
-    std::ifstream mul_file("mul.txt");
-    std::ifstream div_file("div.txt");
+    std::ifstream sum_file("sum.test");
+    std::ifstream sub_file("sub.test");
+    std::ifstream mul_file("mul.test");
+    std::ifstream div_file("div.test");
     lint my_result;
     size_t successed = 0;
     int n = 0;
@@ -120,8 +118,7 @@ void casts_tests()
 {
     auto ll_number = 1000000000000LL;
     lint my_long(ll_number);
-    auto new_ll = static_cast<long long>(my_long);
-    assert(ll_number == new_ll);
+    assert(ll_number == static_cast<long long>(my_long));
 
     long long short_long = 100000;
     lint my(short_long);
@@ -144,6 +141,9 @@ void casts_tests()
     assert(max_int == my_big);
     assert(my_small_overflow == min_int_overflow);
 
+    assert(static_cast<int>(my_big) == INT32_MAX);
+    assert(static_cast<int>(my_small_overflow) == INT32_MIN);
+
     std::cout << "Long long casts passed" << std::endl;
 }
 
@@ -153,6 +153,7 @@ void plus_tests()
     lint num2(1000);
     lint num3("10000000000000000");
     lint num4("10000000000000001");
+    num3.to_string();
     assert(num1 + num2 == 1001);
     assert(num1 + num3 == num4);
     assert(num2 + num1 == 1001);
@@ -217,7 +218,10 @@ void mul_tests()
     assert(num3 * num3 == 100000000);
     assert(num4 * 0 == 0);
     assert((num5 * 0).is_small());
+    auto res = num5 * num4;
     assert((num5 * num4).to_string() == "83427032874670095973945907379893169476596773290186076");
+    assert(num4 * 1 == num4);
+    assert((-1 * num4).to_string() == (-num4).to_string());
 
     std::cout << "mult tests passed" << std::endl;
 }
@@ -255,6 +259,11 @@ void div_tests()
     lint a1("11620050176394463397996547812951676338039007590238314705568399360");
     auto res4(a1 / 4271);
     assert((a1 / 4271).to_string() == "2720686063309403745726187734242958636862329100968933436096558");
+
+    lint c1("978739441777130566209148083226836080409622025180423218431170079971344384");
+    lint c2("-5207251993928654173507308475415265280");
+    c1 /= c2;
+    assert(c1.to_string() == "-187956995919975159440717122274300878");
 
     std::cout << "Division tests passed" << std::endl;
 }
@@ -414,8 +423,9 @@ void from_string_test()
 
 void my_vector_tests()
 {
-    vector<int> vector1;
-    vector<uint32_t> vector2(34);
+    using namespace helpers;
+    bits vector1(0);
+    bits vector2(34);
     vector2[32] = 34;
     vector2[33] = 244;
     vector1.push_back(345);
@@ -435,8 +445,16 @@ void my_vector_tests()
     vector1.push_back(3);
     vector1.push_back(4);
     vector1.push_back(5);
+    auto vector5(vector1);
+    auto vector6(vector1);
+    auto vector7(vector1);
+    auto vector8(vector1);
+    auto vector9(vector1);
 
-    std::cout << "vector tests passed" << std::endl;
+    vector6[0] = 2;
+    vector9[vector1.size() - 1] = 5;
+
+    std::cout << "vector_old tests passed" << std::endl;
 }
 
 void to_string_tests()
@@ -461,24 +479,60 @@ void to_string_tests()
         "8934769679583758672945879243653248740723658749856747564248765783249834263428484275248754");
 }
 
+void long_short_div_tests()
+{
+    
+}
+
+void long_long_div_tests()
+{
+    lint num1("-3337685018533711592795871667265218987553187864987592273118827203149168640");
+    lint num2("-337922113784322481219260974202273723021564191665655367473357206667132928");
+    assert(-num1 / -num2 == 9);
+    auto res = num1 / num2;
+    assert(res == 9);
+}
+
+void positive_negative_div_tests()
+{
+    lint num1("-2335710347765676070248101396666744997854320558980944725163584962019983360");
+    lint num2("-3033133504283735774253788073215218217783737653671023249380399954094194688");
+    assert(-num1 / -num2 == 0);
+    auto res = num1 / num2;
+    assert(res == 0);
+
+    lint num5("-100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001");
+    lint num6("-98000000000000000067031774569072199900349627814759748994040650805381640489125241538626977793");
+    assert(num5 / num6 == lint("1"));
+
+    lint num3("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001");
+    lint num4("9999999999999999931398190359470212947659194368");
+    num3 /= num4;
+    assert(num3 == lint("10000000000000000068601809640529787522961634227"));
+}
+
 void start_my_tests()
 {
     my_vector_tests();
 
     eq_cmp_tests();
 
+    from_string_test();
+    to_string_tests();
+
     plus_tests();
     minus_tests();
-    div_tests();
-    cmp_tests();
     mul_tests();
+    div_tests();
+    long_short_div_tests();
+    long_long_div_tests();
+    positive_negative_div_tests();
+    cmp_tests();
     
     increment_tests();
     decrement_tests(); 
     abs_tests();
     pow_tests();
-    from_string_test();
-    to_string_tests();
     casts_tests();
     great_test();
 }
