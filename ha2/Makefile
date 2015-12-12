@@ -7,7 +7,7 @@ OBJS = \
 	$(BIN)bits.o \
 	$(BIN)mytests.o
 TARGET = ./bin/lint
-CXXFLAGS = -std=c++11 -Wall -g
+CXXFLAGS = -std=c++11 -Wall -g -O2
 
 all: bin build
 
