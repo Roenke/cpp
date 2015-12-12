@@ -445,6 +445,14 @@ void my_vector_tests()
     vector1.push_back(3);
     vector1.push_back(4);
     vector1.push_back(5);
+    auto vector5(vector1);
+    auto vector6(vector1);
+    auto vector7(vector1);
+    auto vector8(vector1);
+    auto vector9(vector1);
+
+    vector6[0] = 2;
+    vector9[vector1.size() - 1] = 5;
 
     std::cout << "vector_old tests passed" << std::endl;
 }
