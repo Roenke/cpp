@@ -1,10 +1,11 @@
 #include "lint.h"
 #include <sstream>
 #include <string>
-#include <iostream>
+#include <algorithm>
+#include <cassert>
 
 using namespace apa;
-using helpers::vector;
+using namespace helpers;
 lint::lint()
     : sign_(0)
     , bits_(nullptr)
@@ -16,16 +17,16 @@ lint::lint(std::string const& s)
     , bits_(nullptr)
 {
     auto str_length = s.length();
-    if(str_length < 10 || (s[0] == '-' && str_length == 10))
+    if (str_length < 10 || (s[0] == '-' && str_length == 10))
     {
         sign_ = atoi(s.c_str());
         return;
     }
 
     sign_ = 1;
-    bits_ = new vector<uint32_t>();
+    bits_ = new bits(0);
     auto start_value = static_cast<int>(s.length());
-    if(s[0] == '-')
+    if (s[0] == '-')
     {
         sign_ = -1;
     }
@@ -59,7 +60,7 @@ lint::lint(double number)
 
 lint::~lint()
 {
-    if(bits_ != nullptr)
+    if (bits_ != nullptr)
     {
         delete bits_;
     }
@@ -69,9 +70,9 @@ lint::lint(lint const& other)
     : sign_(other.sign_)
     , bits_(nullptr)
 {
-    if(other.bits_ != nullptr)
+    if (other.bits_ != nullptr)
     {
-        bits_ = new vector<uint32_t>(*other.bits_);
+        bits_ = new bits(*other.bits_);
     }
 }
 
@@ -82,12 +83,12 @@ lint::operator bool() const
 
 lint::operator int() const
 {
-    if(bits_ == nullptr)
+    if (bits_ == nullptr)
     {
         return sign_;
     }
 
-    if(sign_ == -1 && bits_->size() == 2 && (*bits_)[0] == 147483648 && (*bits_)[1] == 2)
+    if (sign_ == -1 && bits_->size() == 2 && (*bits_)[0] == 147483648 && (*bits_)[1] == 2)
     {
         return INT32_MIN;
     }
@@ -97,13 +98,13 @@ lint::operator int() const
 
 lint::operator long long() const
 {
-    if(bits_ != nullptr)
+    if (bits_ != nullptr)
     {
-        if(bits_->size() > 1)
+        if (bits_->size() > 1)
         {
             return static_cast<long long>((*bits_)[0]) + base * (*bits_)[1];
         }
-        
+
         return (*bits_)[0];
     }
 
@@ -112,25 +113,20 @@ lint::operator long long() const
 
 lint& lint::operator=(lint const& other)
 {
-    if(this != &other)
+    if (this == &other) return *this;
+    
+    delete bits_;
+    if(other.bits_ == nullptr)
     {
-        if(other.bits_ != nullptr)
-        {
-            if(bits_ == nullptr)
-            {
-                bits_ = new vector<uint32_t>();
-            }
-            
-            *bits_ = *other.bits_;
-        }
-        else
-        {
-            delete bits_;
-            bits_ = nullptr;
-        }
-        
-        sign_ = other.sign_;
+        bits_ = nullptr;
     }
+    else
+    {
+        bits_ = new bits(*other.bits_);
+    }
+
+    sign_ = other.sign_;
+
     return *this;
 }
 
@@ -163,12 +159,12 @@ std::string lint::to_string() const
     std::ostringstream ost;
     if (sign_ == -1) ost << '-';
     auto size = bits_->size();
-    sprintf_s(buf, "%u", (*bits_)[static_cast<int>(size - 1)]);
+    sprintf_s(buf, "%u", static_cast<uint32_t>((*bits_)[static_cast<int>(size - 1)]));
     ost << buf;
 
     for (auto i = static_cast<int>(size - 2); i >= 0; --i)
     {
-        sprintf_s(buf, "%09u", (*bits_)[i]);
+        sprintf_s(buf, "%09u", static_cast<uint32_t>((*bits_)[i]));
         ost << buf;
     }
 
@@ -208,15 +204,15 @@ lint& lint::small_division(int num)
 
 void lint::unpack()
 {
-    if(!is_small())
+    if (!is_small())
     {
         return;
     }
-    
+
     auto value = std::abs(sign_);
     sign_ = sign_ >= 0 ? 1 : -1;
 
-    bits_ = new vector<uint32_t>(2);
+    bits_ = new bits(2);
     (*bits_)[0] = value % base;
     (*bits_)[1] = value / base;
 }
@@ -317,7 +313,7 @@ void lint::from_long_long(long long number)
     {
         sign_ = number > 0 ? 1 : -1;
         number *= sign_;
-        bits_ = new vector<uint32_t>(2);
+        bits_ = new bits(2);
         (*bits_)[0] = static_cast<uint32_t>(number % base);
         (*bits_)[1] = static_cast<uint32_t>(number / base);
     }
@@ -325,7 +321,7 @@ void lint::from_long_long(long long number)
 
 lint& lint::try_to_small()
 {
-    if(is_small())
+    if (is_small())
     {
         return *this;
     }
@@ -336,14 +332,14 @@ lint& lint::try_to_small()
             return *this;
     }
 
-    auto value = static_cast<long long>((*bits_)[0]);
+    auto value = static_cast<long long>(static_cast<uint32_t>((*bits_)[0]));
 
-    if(bits_->size() >= 2)
+    if (bits_->size() >= 2)
     {
         value += (*bits_)[1] * base;
     }
 
-    if((sign_ == 1 && value <= INT32_MAX) ||
+    if ((sign_ == 1 && value <= INT32_MAX) ||
         (sign_ == -1 && value >= -INT32_MAX))
     {
         sign_ = sign_ * static_cast<int>(value);
@@ -356,8 +352,7 @@ lint& lint::try_to_small()
 
 void lint::assert_optimization() const
 {
-    // Проверка, что число не может быть представлено как короткое
-    if(bits_ == nullptr)
+    if (bits_ == nullptr)
     {
         return;
     }
@@ -403,12 +398,12 @@ bool apa::operator==(lint const& l, lint const& r)
     {
         return false;
     }
-    if(l.bits_ == nullptr && r.bits_ == nullptr)
+    if (l.bits_ == nullptr && r.bits_ == nullptr)
     {
         return true;
     }
-    
-    if(l.bits_ == nullptr || r.bits_ == nullptr)
+
+    if (l.bits_ == nullptr || r.bits_ == nullptr)
     {
         return false;
     }
@@ -428,17 +423,17 @@ bool apa::operator<(lint const& l, lint const& r)
         return l.sign_ < r.sign_;
     }
 
-    if(l.is_small())
+    if (l.is_small())
     {
         return r.sign_ == 1;
     }
 
-    if(r.is_small())
+    if (r.is_small())
     {
         return l.sign_ == -1;
     }
 
-    if(r.sign_ != l.sign_)
+    if (r.sign_ != l.sign_)
     {
         return l.sign_ < r.sign_;
     }
@@ -466,19 +461,19 @@ bool apa::operator<=(lint const& l, lint const& r)
 lint& lint::operator+=(lint const&r)
 {
     // small object optimize
-    if(is_small() && r.is_small())
+    if (is_small() && r.is_small())
     {
         auto result = static_cast<long long>(r.sign_) + sign_;
         from_long_long(result);
         return *this;
     }
 
-    if(transform_plus(*this, r))
+    if (transform_plus(*this, r))
     {
         return *this;
     }
 
-    if(is_small())
+    if (is_small())
     {
         unpack();
     }
@@ -495,11 +490,11 @@ lint& lint::operator+=(lint const&r)
         {
             bits_->push_back(0);
         }
-        
+
         r_value = (i < r_size ? (*right.bits_)[i] : 0);
-        (*bits_)[i] += k + r_value;
-        k = (*bits_)[i] >= lint::base;
-        if (k)  (*bits_)[i] -= lint::base;
+        (*bits_)[i] = (*bits_)[i] + k + r_value;
+        k = (*bits_)[i] >= base;
+        if (k)  (*bits_)[i] = (*bits_)[i] - base;
     }
 
     return try_to_small();
@@ -507,14 +502,14 @@ lint& lint::operator+=(lint const&r)
 
 lint& apa::lint::operator-=(lint const&r)
 {
-    if(r.is_small() && is_small())
+    if (r.is_small() && is_small())
     {
         auto result = static_cast<long long>(sign_) - r.sign_;
         from_long_long(result);
         return *this;
     }
 
-    if(transform_minus(*this, r))
+    if (transform_minus(*this, r))
     {
         return *this;
     }
@@ -526,16 +521,16 @@ lint& apa::lint::operator-=(lint const&r)
 
     auto right(r);
     right.unpack();
-    if(right.bits_->size() > bits_->size())
+    if (right.bits_->size() > bits_->size())
     {
         bits_->resize(right.bits_->size());
     }
 
     auto k = 0;
     int result;
-    for (size_t i = 0; i < right.bits_->size() || k; ++i) 
+    for (size_t i = 0; i < right.bits_->size() || k; ++i)
     {
-        if(bits_->size() <= i)
+        if (bits_->size() <= i)
         {
             bits_->push_back(0);
         }
@@ -617,7 +612,7 @@ lint& lint::operator/=(lint const& r)
         return small_division(r.sign_);
     }
 
-    if(transdorm_div(*this, r))
+    if (transdorm_div(*this, r))
     {
         return *this;
     }
@@ -643,11 +638,10 @@ lint& lint::operator/=(lint const& r)
         lc = abs_r * center;
         lcp = abs_r * (center + 1);
         bool lesser = lc < abs_l;
-        if (!lesser && lc == abs_l || lesser && lcp > abs_l)
+        if ((!lesser && lc == abs_l) || (lesser && lcp > abs_l))
         {
             break;
         }
-        //std::cout << center << std::endl;
         if (lesser)
         {
             left = center + 1;
@@ -706,14 +700,14 @@ lint apa::pow(lint const& number, long long degree)
 {
     lint result = 1;
     auto acc = number;
-    if(degree == 0)
+    if (degree == 0)
     {
         return 1;
     }
 
-    while(degree != 0)
+    while (degree != 0)
     {
-        if(degree % 2 == 0)
+        if (degree % 2 == 0)
         {
             acc *= acc;
             degree /= 2;

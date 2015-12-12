@@ -1,12 +1,10 @@
 #include "lint.h"
 #include "mytests.h"
-#include "vector.h"
 #include <cassert>
 #include <iostream>
 #include <fstream>
 
 using namespace apa;
-using helpers::vector;
 
 void great_test()
 {
@@ -156,6 +154,7 @@ void plus_tests()
     lint num2(1000);
     lint num3("10000000000000000");
     lint num4("10000000000000001");
+    num3.to_string();
     assert(num1 + num2 == 1001);
     assert(num1 + num3 == num4);
     assert(num2 + num1 == 1001);
@@ -220,7 +219,10 @@ void mul_tests()
     assert(num3 * num3 == 100000000);
     assert(num4 * 0 == 0);
     assert((num5 * 0).is_small());
+    auto res = num5 * num4;
     assert((num5 * num4).to_string() == "83427032874670095973945907379893169476596773290186076");
+    assert(num4 * 1 == num4);
+    assert((-1 * num4).to_string() == (-num4).to_string());
 
     std::cout << "mult tests passed" << std::endl;
 }
@@ -422,8 +424,9 @@ void from_string_test()
 
 void my_vector_tests()
 {
-    vector<int> vector1;
-    vector<uint32_t> vector2(34);
+    using namespace helpers;
+    bits vector1(0);
+    bits vector2(34);
     vector2[32] = 34;
     vector2[33] = 244;
     vector1.push_back(345);
@@ -444,7 +447,7 @@ void my_vector_tests()
     vector1.push_back(4);
     vector1.push_back(5);
 
-    std::cout << "vector tests passed" << std::endl;
+    std::cout << "vector_old tests passed" << std::endl;
 }
 
 void to_string_tests()
@@ -507,21 +510,22 @@ void start_my_tests()
 
     eq_cmp_tests();
 
+    from_string_test();
+    to_string_tests();
+
     plus_tests();
     minus_tests();
+    mul_tests();
     div_tests();
     long_short_div_tests();
     long_long_div_tests();
     positive_negative_div_tests();
     cmp_tests();
-    mul_tests();
     
     increment_tests();
     decrement_tests(); 
     abs_tests();
     pow_tests();
-    from_string_test();
-    to_string_tests();
     casts_tests();
     great_test();
 }

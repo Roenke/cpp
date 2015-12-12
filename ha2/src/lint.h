@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <string>
-#include "vector.h"
+#include "bits.h"
 
 namespace apa
 {
@@ -21,7 +21,6 @@ namespace apa
         explicit operator long long() const;
 
         lint& operator=(lint const&);
-       // bool operator!(); // вроде лишнее                // Возможность использовать в условных выражениях (true, если не ноль)
 
         lint operator+() const;
         lint operator-() const;
@@ -42,7 +41,7 @@ namespace apa
         static uint64_t constexpr base = 1000 * 1000 * 1000;
         
         int sign_;
-        helpers::vector<uint32_t>* bits_;
+        helpers::bits* bits_;
 
         void unpack(); // unsafe method.
         bool is_zero() const;
