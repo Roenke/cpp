@@ -2,7 +2,7 @@
 #include <algorithm>
 
 helpers::bits_buffer::bits_buffer(size_t size)
-    : size_(std::max(size, 1U))
+    : size_(std::max(size, static_cast<size_t>(1)))
     , links_count_(new size_t(1))
     , data_(new uint32_t[size_])
 {
@@ -89,7 +89,7 @@ void helpers::bits_buffer::dup()
 
 void helpers::bits_buffer::unlink()
 {
-    *--links_count_;
+    --*links_count_;
 }
 
 void helpers::bits_buffer::fill() const

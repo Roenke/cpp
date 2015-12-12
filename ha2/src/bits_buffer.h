@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-
+#include <cstddef>
 namespace helpers
 {
     struct bits_buffer

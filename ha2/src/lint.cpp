@@ -159,12 +159,12 @@ std::string lint::to_string() const
     std::ostringstream ost;
     if (sign_ == -1) ost << '-';
     auto size = bits_->size();
-    sprintf_s(buf, "%u", static_cast<uint32_t>((*bits_)[static_cast<int>(size - 1)]));
+    sprintf(buf, "%u", static_cast<uint32_t>((*bits_)[static_cast<int>(size - 1)]));
     ost << buf;
 
     for (auto i = static_cast<int>(size - 2); i >= 0; --i)
     {
-        sprintf_s(buf, "%09u", static_cast<uint32_t>((*bits_)[i]));
+        sprintf(buf, "%09u", static_cast<uint32_t>((*bits_)[i]));
         ost << buf;
     }
 
