@@ -50,6 +50,8 @@ void great_test()
     for (int i = 1; i <= n; ++i)
     {
         mul_file >> a >> b >> result;
+		auto str = result.to_string();
+		auto c = new lint(str);
         my_result = a * b;
         if (my_result == result)
         {
@@ -58,6 +60,10 @@ void great_test()
         else
         {
             std::cout << "Wrong answer test " << i << std::endl;
+			std::cout << "a = " << a << std::endl;
+			std::cout << "b = " << b << std::endl;
+			std::cout << "res = " << result << std::endl;
+			std::cout << "my res = " << my_result << std::endl;
         }
     }
     std::cout << "Mul tests result: " << successed << " / " << n << std::endl;
@@ -406,7 +412,7 @@ void from_string_test()
     assert(num2.is_small());
 
     lint num3("1000000000");
-    assert(!num3.is_small());
+    assert(num3.is_small());
 
     lint num4("10000000010");
     lint num5("999999999");

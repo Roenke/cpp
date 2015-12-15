@@ -50,6 +50,7 @@ lint::lint(std::string const& s)
     }
 
     while (bits_->size() > 1 && bits_->back() == 0) (void)bits_->pop_back();
+	try_to_small();
 }
 
 lint::lint(int number)
@@ -326,9 +327,16 @@ void lint::from_long_long(long long number)
     {
         sign_ = number > 0 ? 1 : -1;
         number *= sign_;
-        bits_ = new bits(2);
-        (*bits_)[0] = static_cast<uint32_t>(number % base);
-        (*bits_)[1] = static_cast<uint32_t>(number / base);
+		bits_ = new bits(0);
+		while(number >= base)
+		{
+			bits_->push_back(number % base);
+			number /= base;
+		}
+		if(number > 0)
+		{
+			bits_->push_back(number);
+		}
     }
 }
 
@@ -352,8 +360,7 @@ lint& lint::try_to_small()
         value += (*bits_)[1] * base;
     }
 
-    if ((sign_ == 1 && value <= INT32_MAX) ||
-        (sign_ == -1 && value >= -INT32_MAX))
+    if (value <= INT32_MAX)
     {
         sign_ = sign_ * static_cast<int>(value);
         delete bits_;
@@ -603,9 +610,10 @@ lint& lint::operator/=(lint const& r)
     }
 
     uint32_t divisor_abs = std::abs(r.sign_);
-    if (r.is_small() && divisor_abs < lint::base)
+    if (r.is_small()&& divisor_abs < lint::base)
     {
-        return small_division(r.sign_);
+		*this = small_division(r.sign_);
+		return try_to_small();
     }
 
     if (transdorm_div(*this, r))
@@ -621,6 +629,7 @@ lint& lint::operator/=(lint const& r)
 
     lint left(0);
     auto abs_r = abs(r);
+	abs_r.unpack();
     auto abs_l = abs(*this);
     auto right(abs_l);
     right.unpack();
@@ -648,7 +657,7 @@ lint& lint::operator/=(lint const& r)
         }
     }
 
-    *this = (sign_ * r.sign_) * center;
+    *this = sign_ * (r.sign_ >= 0 ? 1 : -1) * center;
     return try_to_small();
 }
 
