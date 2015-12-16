@@ -50,8 +50,6 @@ void great_test()
     for (int i = 1; i <= n; ++i)
     {
         mul_file >> a >> b >> result;
-		auto str = result.to_string();
-		auto c = new lint(str);
         my_result = a * b;
         if (my_result == result)
         {
@@ -60,10 +58,10 @@ void great_test()
         else
         {
             std::cout << "Wrong answer test " << i << std::endl;
-			std::cout << "a = " << a << std::endl;
-			std::cout << "b = " << b << std::endl;
-			std::cout << "res = " << result << std::endl;
-			std::cout << "my res = " << my_result << std::endl;
+            std::cout << "a = " << a << std::endl;
+            std::cout << "b = " << b << std::endl;
+            std::cout << "res = " << result << std::endl;
+            std::cout << "my res = " << my_result << std::endl;
         }
     }
     std::cout << "Mul tests result: " << successed << " / " << n << std::endl;
