@@ -62,8 +62,35 @@ void retrieve_value_test()
 
 void swap_test(any& a, any& b)
 {
-    // TODO: Ќаверное правильнее свой своп сделать.
     swap(a, b);
+}
+
+void my_tests()
+{
+    any a1(10);
+    auto a2(a1);
+    auto a3 = a2;
+
+    any a4{};
+    assert(a4.empty());
+    a4 = 5;
+    assert(a4.type() == a1.type());
+
+    a1 = static_cast<char*>("ewpkjdf");
+    assert(a1.type() != a2.type());
+
+    bool throwed = false;
+    try
+    {
+        auto a = any_cast<std::exception>(a1);
+    }
+    catch(bad_any_cast const& e)
+    {
+        cout << e.what() << endl;
+        throwed = true;
+    }
+
+    assert(throwed);
 }
 
 int main()
@@ -73,6 +100,8 @@ int main()
 
     any a(5), b(string("6"));
     swap_test(a, b);
+
+    my_tests();
 
     return 0;
 }
