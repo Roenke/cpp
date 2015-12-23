@@ -34,12 +34,11 @@ bool utils::any::empty() const
     return inner_ == nullptr;
 }
 
-utils::bad_any_cast::bad_any_cast(std::string const& what)
-    : type_(what)
+utils::bad_any_cast::bad_any_cast(std::string const& type)
+    : what_(std::string("Bad cast exception to type: ") + type)
 {}
 
 char const* utils::bad_any_cast::what() const throw()
 {
-    auto str = std::string("Bad cast exception to type: ") + type_;
-    return str.c_str();
+    return what_.c_str();
 }
