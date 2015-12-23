@@ -2,8 +2,8 @@
 #include <exception>
 #include <memory>
 #include <string>
-#include <typeinfo>
 #include <type_traits>
+#include <typeinfo>
 
 namespace utils
 {
@@ -31,8 +31,6 @@ namespace utils
         };
     public:
         any();
-        ~any();
-
         template<typename T>
         explicit any(T const&);
         any(any const&);
@@ -41,10 +39,12 @@ namespace utils
         any& operator=(T const&);
         any& operator=(any);
 
-        std::type_info const& type() const;
-        friend void swap(any& l, any& r);
+        ~any();
 
+        std::type_info const& type() const;
         bool empty() const;
+
+        friend void swap(any& l, any& r);
     private:
         inner_base* inner_;
 
@@ -60,12 +60,12 @@ namespace utils
         virtual const char* what() const noexcept override;
 
     private:
-        std::string type_;
+        std::string what_;
     };
 
     template<typename T> T any_cast(any & operand);
     template<typename T> T any_cast(const any & operand);
-    template <typename ValueType> ValueType* any_cast(any * operand);
+    template<typename ValueType>       ValueType * any_cast(any * operand);
     template<typename ValueType> const ValueType * any_cast(const any * operand);
 
     template <typename T>
