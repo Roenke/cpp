@@ -84,9 +84,8 @@ void my_tests()
     {
         auto a = any_cast<std::exception>(a1);
     }
-    catch(bad_any_cast const& e)
+    catch(bad_any_cast)
     {
-        cout << e.what() << endl;
         throwed = true;
     }
 
