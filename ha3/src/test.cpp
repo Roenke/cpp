@@ -76,7 +76,7 @@ void my_tests()
     a4 = 5;
     assert(a4.type() == a1.type());
 
-    a1 = static_cast<char*>("ewpkjdf");
+    a1 = 'c';
     assert(a1.type() != a2.type());
 
     bool throwed = false;

@@ -2,6 +2,8 @@
 #include <exception>
 #include <memory>
 #include <string>
+#include <typeinfo>
+#include <type_traits>
 
 namespace utils
 {
@@ -11,7 +13,7 @@ namespace utils
         struct inner_base
         {
             virtual ~inner_base();
-            virtual type_info const& type() const = 0;
+            virtual std::type_info const& type() const = 0;
             virtual inner_base* clone() const = 0;
         };
 
@@ -19,7 +21,7 @@ namespace utils
         struct inner : inner_base
         {
             explicit inner(T const& value);
-            type_info const& type() const override;
+            std::type_info const& type() const override;
             inner_base* clone() const override;
         private:
             T value_;
@@ -39,7 +41,7 @@ namespace utils
         any& operator=(T const&);
         any& operator=(any);
 
-        type_info const& type() const;
+        std::type_info const& type() const;
         friend void swap(any& l, any& r);
 
         bool empty() const;
@@ -55,7 +57,7 @@ namespace utils
     public:
         explicit bad_any_cast(std::string const&);
 
-        const char* what() const override;
+        virtual const char* what() const noexcept override;
 
     private:
         std::string type_;
@@ -72,7 +74,7 @@ namespace utils
     {}
 
     template <typename T>
-    type_info const& any::inner<T>::type() const
+    std::type_info const& any::inner<T>::type() const
     {
         return typeid(T);
     }
@@ -81,6 +83,11 @@ namespace utils
     any::inner_base* any::inner<T>::clone() const
     {
         return new inner(value_);
+    }
+
+    inline void swap(any& l, any& r)
+    {
+        std::swap(l.inner_, r.inner_);
     }
 
     template <typename T>
@@ -129,9 +136,4 @@ template <typename ValueType>
 const ValueType* utils::any_cast(const any* operand)
 {
     return any_cast<ValueType>(const_cast<utils::any*>(operand));
-}
-
-inline void utils::swap(any& l, any& r)
-{
-    std::swap(l.inner_, r.inner_);
 }

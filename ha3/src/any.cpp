@@ -24,7 +24,7 @@ utils::any& utils::any::operator=(any other)
     return *this;
 }
 
-type_info const& utils::any::type() const
+std::type_info const& utils::any::type() const
 {
     return inner_->type();
 }
