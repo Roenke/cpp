@@ -5,16 +5,16 @@
 
 namespace utils
 {
-    class empty_class{};
+    class empty_class {};
 
     const empty_class empty = empty_class();
 
     class maybe_exception
-        : public std::exception
+        : public std::runtime_error
     {
     public:
-        explicit maybe_exception(const char* _Message)
-            : exception(_Message)
+        maybe_exception()
+            : runtime_error("Maybe is empty")
         {
         }
     };
@@ -46,9 +46,11 @@ namespace utils
 
     private:
         void fill_zero();
+        T* ptr();
+        T const* ptr() const;
 
-        uint8_t object_[sizeof(T)];
-        
+        char object_[sizeof(T)];
+
         bool is_empty_;
     };
 
@@ -83,7 +85,7 @@ namespace utils
         }
         else
         {
-            for (auto i = 0; i < sizeof(T); ++i)
+            for (size_t i = 0; i < sizeof(T); ++i)
             {
                 object_[i] = other.object_[i];
             }
@@ -115,25 +117,25 @@ namespace utils
     template <typename T>
     T* maybe<T>::operator->()
     {
-        return &(get());
+        return ptr();
     }
 
     template <typename T>
     T const* maybe<T>::operator->() const
     {
-        return &(get());
+        return ptr();
     }
 
     template <typename T>
     T& maybe<T>::operator*()
     {
-        return get();
+        return *ptr();
     }
 
     template <typename T>
     T const& maybe<T>::operator*() const
     {
-        return get();
+        return *ptr();
     }
 
     template <typename T>
@@ -141,27 +143,27 @@ namespace utils
     {
         if (is_empty_)
         {
-            throw maybe_exception("Maybe is empty");
+            throw maybe_exception();
         }
 
-        return *reinterpret_cast<T*>(object_);
+        return *(ptr());
     }
 
     template <typename T>
     T const& maybe<T>::get() const
     {
-        if(is_empty_)
+        if (is_empty_)
         {
-            throw maybe_exception("Maybe is empty");
+            throw maybe_exception();
         }
 
-        return *reinterpret_cast<T const*>(object_);
+        return *(ptr());
     }
 
     template <typename T>
     maybe<T>::operator bool() const
     {
-        return !is_empty_();
+        return !is_empty_;
     }
 
     template <typename T>
@@ -173,9 +175,21 @@ namespace utils
     template <typename T>
     void maybe<T>::fill_zero()
     {
-        for (auto i = 0; i < sizeof(T); ++i)
+        for (size_t i = 0; i < sizeof(T); ++i)
         {
             object_[i] = 0;
         }
+    }
+
+    template <typename T>
+    T* maybe<T>::ptr()
+    {
+        return reinterpret_cast<T*>(object_);
+    }
+
+    template <typename T>
+    T const* maybe<T>::ptr() const
+    {
+        return reinterpret_cast<T const*>(object_);
     }
 }
