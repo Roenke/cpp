@@ -119,7 +119,7 @@ T utils::any_cast(any& operand)
 template <typename T>
 T utils::any_cast(const any& operand)
 {
-    return any_cast<typename std::remove_reference<T>::type const>(const_cast<any&>(operand));
+    return any_cast<typename std::remove_reference<T>::type const&>(const_cast<any&>(operand));
 }
 
 template <typename ValueType> ValueType* utils::any_cast(utils::any * operand)
