@@ -85,16 +85,19 @@ namespace utils
         }
         else
         {
-            for (size_t i = 0; i < sizeof(T); ++i)
-            {
-                object_[i] = other.object_[i];
-            }
+            ptr()->~T();
+            new (object_) T(other.object_);
         }
     }
 
     template <typename T>
     maybe<T>::~maybe()
-    {}
+    {
+        if(!is_empty_)
+        {
+            ptr()->~T();
+        }
+    }
 
     template <typename T>
     maybe<T>& maybe<T>::operator=(T const& value)
