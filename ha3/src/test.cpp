@@ -90,6 +90,9 @@ void my_tests()
     }
 
     assert(throwed);
+
+    const auto& a = a1;
+    auto b = any_cast<const int&>(a);
 }
 
 int main()
